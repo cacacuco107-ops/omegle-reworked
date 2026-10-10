@@ -203,6 +203,7 @@ app.get('/', (req, res) => {
         let isVideoMode = false;
         let isDisconnecting = false;
         let pendingIceCandidates = [];
+        let pendingSignals = [];
         let connectionGeneration = 0;
 
         const localVideo = document.getElementById('localVideo');
@@ -431,6 +432,7 @@ app.get('/', (req, res) => {
         function closeConnection() {
             connectionGeneration++;
             pendingIceCandidates = [];
+            pendingSignals = [];
             if (peerConnection) {
                 peerConnection.ontrack = null;
                 peerConnection.onicecandidate = null;
@@ -475,6 +477,7 @@ app.get('/', (req, res) => {
             currentRoom = roomId;
             isSearching = false;
             pendingIceCandidates = [];
+            pendingSignals = [];
             statusBar.innerText = '¡Conectado!';
             actionBtn.innerText = 'Stop';
             actionBtn.className = 'btn-action btn-stop';
@@ -521,10 +524,25 @@ app.get('/', (req, res) => {
 
             pc.ontrack = (event) => {
                 if (generation !== connectionGeneration) return;
+                // Some browsers may deliver a track without event.streams[0].
+                // Build a MediaStream in that case so the remote video still renders.
                 if (event.streams && event.streams[0]) {
                     remoteVideo.srcObject = event.streams[0];
-                    remoteVideo.play().catch(() => {});
+                } else {
+                    let stream = remoteVideo.srcObject;
+                    if (!(stream instanceof MediaStream)) {
+                        stream = new MediaStream();
+                        remoteVideo.srcObject = stream;
+                    }
+                    if (!stream.getTracks().some(track => track.id === event.track.id)) {
+                        stream.addTrack(event.track);
+                    }
                 }
+                remoteVideo.autoplay = true;
+                remoteVideo.playsInline = true;
+                remoteVideo.play().catch((err) => {
+                    console.warn('No se pudo reproducir el vídeo remoto automáticamente:', err);
+                });
             };
 
             pc.onicecandidate = (event) => {
@@ -549,6 +567,11 @@ app.get('/', (req, res) => {
                 }
             };
 
+            // Process any offer/ICE signals that arrived before setupWebRTC finished.
+            const earlySignals = pendingSignals;
+            pendingSignals = [];
+            for (const signal of earlySignals) processSignal(signal);
+
             // Only the designated initiator creates the offer. The answerer waits for it.
             if (isInitiator) {
                 createAndSendOffer(pc, roomId, generation).catch(err => {
@@ -566,9 +589,15 @@ app.get('/', (req, res) => {
             socket.emit('signal', { roomId, sdp: pc.localDescription });
         }
 
-        socket.on('signal', async (data) => {
-            if (!data || !currentRoom || data.roomId !== currentRoom || !peerConnection) return;
+        async function processSignal(data) {
+            if (!data || !currentRoom || data.roomId !== currentRoom) return;
             const pc = peerConnection;
+            if (!pc) {
+                // The match event and the first WebRTC signal can arrive very close together.
+                // Keep the signal instead of silently dropping the offer/ICE candidate.
+                if (pendingSignals.length < 100) pendingSignals.push(data);
+                return;
+            }
             const generation = connectionGeneration;
 
             try {
@@ -576,7 +605,6 @@ app.get('/', (req, res) => {
                     await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
                     if (generation !== connectionGeneration || pc !== peerConnection) return;
 
-                    // Apply candidates that arrived before the remote description.
                     const queued = pendingIceCandidates;
                     pendingIceCandidates = [];
                     for (const candidate of queued) {
@@ -600,7 +628,13 @@ app.get('/', (req, res) => {
                 }
             } catch (err) {
                 console.warn('Error procesando señal WebRTC:', err);
+                statusBar.innerText = 'Error al negociar el vídeo. Revisa la consola del navegador.';
             }
+        }
+
+        socket.on('signal', (data) => {
+            if (!data || !currentRoom || data.roomId !== currentRoom) return;
+            processSignal(data);
         });
 
         function safeText(value) {

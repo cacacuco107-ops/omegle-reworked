@@ -281,19 +281,28 @@ app.get('/', (req, res) => {
                 }
                 localStream = stream;
                 localVideo.srcObject = localStream;
-                statusBar.innerText = 'Cámara lista. Cargando seguridad...';
+                localVideo.muted = true;
+                localVideo.playsInline = true;
+                localVideo.play().catch(() => {});
+                statusBar.innerText = 'Cámara lista. Conectando vídeo...';
 
-                if (!nsfwModel) {
-                    if (!nsfwLoadPromise) {
-                        nsfwLoadPromise = nsfwjs.load().catch((err) => {
-                            nsfwLoadPromise = null;
-                            throw err;
-                        });
-                    }
-                    nsfwModel = await nsfwLoadPromise;
-                }
-                statusBar.innerText = 'Sistema listo.';
+                // No bloquear WebRTC esperando a que cargue el detector de seguridad.
+                // La conexión entre teléfonos debe comenzar en cuanto la cámara esté lista.
                 startVideoScanner();
+                if (!nsfwModel && !nsfwLoadPromise) {
+                    nsfwLoadPromise = nsfwjs.load()
+                        .then((model) => {
+                            nsfwModel = model;
+                            statusBar.innerText = currentRoom ? 'Conectando vídeo...' : 'Cámara lista. Buscando a alguien...';
+                            return model;
+                        })
+                        .catch((err) => {
+                            console.warn('No se pudo cargar el detector de seguridad:', err);
+                            nsfwLoadPromise = null;
+                            // La cámara y el chat de vídeo pueden continuar sin este detector.
+                            return null;
+                        });
+                }
             } catch (err) {
                 console.error('Error al iniciar cámara o detector:', err);
                 if (isVideoMode && !localStream) {

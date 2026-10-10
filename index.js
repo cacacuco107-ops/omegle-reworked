@@ -15,47 +15,71 @@ app.get('/', (req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omegle: Talk to strangers!</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
         body { background: #fff; color: #333; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { border-bottom: 2px solid #365899; padding: 8px 15px; }
-        .logo { font-size: 24px; font-weight: bold; color: #365899; text-decoration: none; }
-        .logo span { color: #ff7700; }
         
-        /* Controles en la parte superior */
-        .controls-panel { height: 50px; background: #fff; border-bottom: 1px solid #ccc; display: flex; padding: 6px 10px; gap: 8px; align-items: center; }
-        button.btn-action { background: #3b5998; color: #fff; border: 1px solid #1e2e54; font-size: 15px; font-weight: bold; padding: 0 16px; height: 38px; border-radius: 4px; cursor: pointer; }
-        button.btn-stop { background: #ff4500; border-color: #992900; }
-        input[type="text"] { flex: 1; height: 38px; border: 1px solid #ccc; border-radius: 4px; padding: 0 10px; font-size: 14px; }
+        /* Header clásico Omegle */
+        header { background: #fff; border-bottom: 3px solid #365899; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 32px; font-weight: bold; color: #365899; text-decoration: none; font-family: 'Arial Black', Gadget, sans-serif; }
+        .logo span { color: #ff7700; }
+        .tagline { font-size: 13px; color: #555; font-weight: bold; }
+
+        /* Selector de Modo (Video / Texto) */
+        .mode-selector { background: #e9ebee; border-bottom: 1px solid #ccc; padding: 8px 15px; display: flex; align-items: center; gap: 15px; font-size: 14px; }
+        .mode-selector label { font-weight: bold; color: #333; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+        /* Panel de Controles Arriba */
+        .controls-panel { height: 50px; background: #fff; border-bottom: 1px solid #ccc; display: flex; padding: 6px 12px; gap: 8px; align-items: center; }
+        button.btn-action { background: #3b5998; color: #fff; border: 1px solid #1e2e54; font-size: 15px; font-weight: bold; padding: 0 20px; height: 38px; border-radius: 4px; cursor: pointer; }
+        button.btn-action:hover { background: #2d4373; }
+        button.btn-stop { background: #d9534f; border-color: #d43f3a; }
+        button.btn-stop:hover { background: #c9302c; }
+        input[type="text"] { flex: 1; height: 38px; border: 1px solid #ccc; border-radius: 4px; padding: 0 12px; font-size: 14px; outline: none; }
+        input[type="text"]:focus { border-color: #365899; }
 
         .main-container { display: flex; flex: 1; padding: 8px; gap: 8px; background: #f0f2f5; flex-direction: column; overflow: hidden; }
-        @media (min-width: 600px) { .main-container { flex-direction: row; } }
+        @media (min-width: 650px) { .main-container { flex-direction: row; } }
         
-        /* Panel de video: Tu cámara a la izquierda, Stranger a la derecha */
+        /* Panel de video */
         .video-panel { flex: 1; display: flex; gap: 8px; }
-        @media (min-width: 600px) { .video-panel { flex: 2; flex-direction: column; } }
-        .video-box { flex: 1; background: #000; border-radius: 6px; border: 2px solid #ccc; position: relative; overflow: hidden; min-height: 120px; }
+        @media (min-width: 650px) { .video-panel { flex: 2; flex-direction: column; } }
+        .video-box { flex: 1; background: #000; border-radius: 4px; border: 2px solid #365899; position: relative; overflow: hidden; min-height: 140px; }
         video { width: 100%; height: 100%; object-fit: cover; }
         #localVideo { transform: scaleX(-1); }
-        .video-label { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .video-label { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.7); color: #fff; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
         
+        /* Ocultar panel de video en Modo Texto */
+        body.text-mode-active .video-panel { display: none !important; }
+
         /* Panel de chat */
-        .chat-panel { flex: 1; display: flex; flex-direction: column; background: #fff; border: 1px solid #ccc; border-radius: 6px; }
-        .chat-box { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 14px; max-height: 250px; }
-        .msg { word-break: break-word; }
+        .chat-panel { flex: 1; display: flex; flex-direction: column; background: #fff; border: 1px solid #ccc; border-radius: 4px; }
+        .chat-box { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 14px; max-height: 100%; background: #fff; }
+        .msg { word-break: break-word; line-height: 1.4; }
         .msg.you { color: #0000ff; font-weight: bold; }
         .msg.stranger { color: #ff0000; font-weight: bold; }
         .msg.system { color: #555; font-style: italic; font-size: 12px; }
-        .msg.location { color: #2563eb; font-weight: bold; background: #eff6ff; padding: 4px; border-radius: 4px; }
+        .msg.location { color: #2563eb; font-weight: bold; background: #eff6ff; padding: 4px 8px; border-radius: 4px; border-left: 3px solid #365899; }
         
-        .status-bar { background: #e9ebee; color: #333; padding: 4px 15px; font-size: 12px; }
+        /* Barra de estado inferior */
+        .status-bar { background: #e9ebee; color: #555; padding: 5px 15px; font-size: 12px; border-top: 1px solid #ccc; font-weight: bold; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/nsfwjs"></script>
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <header><a href="#" class="logo">omegle<span>.com</span></a></header>
+    <header>
+        <a href="#" class="logo">omegle<span>.com</span></a>
+        <span class="tagline">Talk to strangers!</span>
+    </header>
     
+    <!-- Selector Video / Texto -->
+    <div class="mode-selector">
+        <span><strong>Modo de chat:</strong></span>
+        <label><input type="radio" name="chatMode" value="video" checked onchange="toggleMode()"> 📹 Video + Texto</label>
+        <label><input type="radio" name="chatMode" value="text" onchange="toggleMode()"> 💬 Solo Texto</label>
+    </div>
+
     <div class="controls-panel">
         <button id="actionBtn" class="btn-action">Start</button>
         <input type="text" id="msgInput" placeholder="Escribe un mensaje..." disabled>
@@ -63,12 +87,14 @@ app.get('/', (req, res) => {
     </div>
 
     <div class="main-container">
-        <div class="video-panel">
+        <!-- Panel de Video (Tu cámara a la izquierda, Stranger a la derecha) -->
+        <div class="video-panel" id="videoPanel">
             <div class="video-box"><video id="localVideo" autoplay playsinline muted></video><div class="video-label" id="myLabel">You</div></div>
             <div class="video-box"><video id="remoteVideo" autoplay playsinline></video><div class="video-label" id="strangerLabel">Stranger</div></div>
         </div>
+        <!-- Panel de Chat -->
         <div class="chat-panel">
-            <div class="chat-box" id="chatBox"><div class="msg system">Presiona Start para buscar.</div></div>
+            <div class="chat-box" id="chatBox"><div class="msg system">Presiona Start para buscar a un extraño.</div></div>
         </div>
     </div>
     <div class="status-bar" id="statusBar">Iniciando sistema...</div>
@@ -78,6 +104,7 @@ app.get('/', (req, res) => {
         let localStream, peerConnection, currentRoom, nsfwModel;
         let myLocation = "Ubicación desconocida";
         let isSearching = false;
+        let isVideoMode = true;
 
         const localVideo = document.getElementById('localVideo');
         const remoteVideo = document.getElementById('remoteVideo');
@@ -92,17 +119,46 @@ app.get('/', (req, res) => {
         actionBtn.onclick = handleActionBtn;
         sendBtn.onclick = sendMessage;
 
+        function toggleMode() {
+            const selected = document.querySelector('input[name="chatMode"]:checked').value;
+            isVideoMode = (selected === 'video');
+            if (isVideoMode) {
+                document.body.classList.remove('text-mode-active');
+                initCamera();
+            } else {
+                document.body.classList.add('text-mode-active');
+                stopCamera();
+                statusBar.innerText = "Modo Solo Texto activo. Listo para buscar.";
+            }
+        }
+
         async function init() {
+            fetchLocation();
+            if (isVideoMode) {
+                await initCamera();
+            }
+        }
+
+        async function initCamera() {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream;
+                if (!localStream) {
+                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    localVideo.srcObject = localStream;
+                }
                 statusBar.innerText = "Cámara lista. Cargando seguridad...";
-                fetchLocation();
-                nsfwModel = await nsfwjs.load();
+                if (!nsfwModel) nsfwModel = await nsfwjs.load();
                 statusBar.innerText = "Sistema listo.";
                 setInterval(scanVideo, 3000);
             } catch (err) {
-                if (!localStream) statusBar.innerText = "Error: Permite el acceso a la cámara.";
+                if (isVideoMode && !localStream) statusBar.innerText = "Permite el acceso a la cámara o cambia al modo Solo Texto.";
+            }
+        }
+
+        function stopCamera() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+                localVideo.srcObject = null;
             }
         }
 
@@ -118,10 +174,10 @@ app.get('/', (req, res) => {
         }
 
         async function scanVideo() {
-            if (nsfwModel && localVideo.readyState === 4) {
+            if (isVideoMode && nsfwModel && localVideo.readyState === 4) {
                 const predictions = await nsfwModel.classify(localVideo);
                 const unsafe = predictions.find(p => (p.className === 'Porn' || p.className === 'Hentai') && p.probability > 0.65);
-                if (unsafe) { addSystemMsg("Seguridad: Contenido inapropiado."); disconnect(); }
+                if (unsafe) { addSystemMsg("Seguridad: Contenido inapropiado detectado."); disconnect(); }
             }
         }
 
@@ -138,7 +194,7 @@ app.get('/', (req, res) => {
             statusBar.innerText = "Buscando un extraño...";
             actionBtn.innerText = "Stop";
             actionBtn.className = "btn-action btn-stop";
-            socket.emit('find_partner', myLocation);
+            socket.emit('find_partner', { location: myLocation, mode: isVideoMode ? 'video' : 'text' });
         }
 
         function sendMessage() {
@@ -176,9 +232,9 @@ app.get('/', (req, res) => {
             document.getElementById('strangerLabel').innerText = "Stranger";
         }
 
-        socket.on('waiting', () => { statusBar.innerText = "Esperando conexión..."; });
+        socket.on('waiting', () => { statusBar.innerText = "Esperando conexión con un extraño..."; });
 
-        socket.on('matched', ({ roomId, isInitiator, partnerLocation }) => {
+        socket.on('matched', ({ roomId, isInitiator, partnerLocation, mode }) => {
             currentRoom = roomId;
             isSearching = false;
             statusBar.innerText = "¡Conectado!";
@@ -191,7 +247,10 @@ app.get('/', (req, res) => {
                 addLocationMsg("El extraño está en: " + partnerLocation);
                 document.getElementById('strangerLabel').innerText = "Stranger (" + partnerLocation + ")";
             }
-            setupWebRTC(isInitiator);
+            
+            if (mode === 'video' && isVideoMode) {
+                setupWebRTC(isInitiator);
+            }
         });
 
         socket.on('partner_left', () => {
@@ -205,6 +264,7 @@ app.get('/', (req, res) => {
         socket.on('chat_message', (text) => { addMsg("Stranger: ", text, "stranger"); });
 
         function setupWebRTC(isInitiator) {
+            if (!localStream) return;
             peerConnection = new RTCPeerConnection(rtcConfig);
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
             peerConnection.ontrack = (e) => { remoteVideo.srcObject = e.streams[0]; };
@@ -253,30 +313,38 @@ app.get('/', (req, res) => {
     `);
 });
 
-let waitingUser = null;
+// Colas separadas para Video y Solo Texto
+let waitingVideoUser = null;
+let waitingTextUser = null;
 
 io.on('connection', (socket) => {
-    socket.on('find_partner', (location) => {
-        socket.location = location;
-        if (waitingUser && waitingUser.id !== socket.id) {
-            const partner = waitingUser;
-            waitingUser = null;
+    socket.on('find_partner', (data) => {
+        socket.location = data.location;
+        socket.mode = data.mode;
+
+        let waitingQueue = (socket.mode === 'video') ? waitingVideoUser : waitingTextUser;
+
+        if (waitingQueue && waitingQueue.id !== socket.id) {
+            const partner = waitingQueue;
+            if (socket.mode === 'video') waitingVideoUser = null;
+            else waitingTextUser = null;
+
             const roomId = `room_${socket.id}_${partner.id}`;
             socket.join(roomId);
             partner.join(roomId);
 
-            socket.emit('matched', { roomId, isInitiator: true, partnerLocation: partner.location });
-            partner.emit('matched', { roomId, isInitiator: false, partnerLocation: socket.location });
+            socket.emit('matched', { roomId, isInitiator: true, partnerLocation: partner.location, mode: socket.mode });
+            partner.emit('matched', { roomId, isInitiator: false, partnerLocation: socket.location, mode: socket.mode });
         } else {
-            waitingUser = socket;
+            if (socket.mode === 'video') waitingVideoUser = socket;
+            else waitingTextUser = socket;
             socket.emit('waiting');
         }
     });
 
     socket.on('cancel_search', () => {
-        if (waitingUser && waitingUser.id === socket.id) {
-            waitingUser = null;
-        }
+        if (waitingVideoUser && waitingVideoUser.id === socket.id) waitingVideoUser = null;
+        if (waitingTextUser && waitingTextUser.id === socket.id) waitingTextUser = null;
     });
 
     socket.on('signal', (data) => { socket.to(data.roomId).emit('signal', data); });
@@ -284,10 +352,12 @@ io.on('connection', (socket) => {
     socket.on('leave_room', (roomId) => {
         socket.to(roomId).emit('partner_left');
         socket.leave(roomId);
-        if (waitingUser && waitingUser.id === socket.id) waitingUser = null;
+        if (waitingVideoUser && waitingVideoUser.id === socket.id) waitingVideoUser = null;
+        if (waitingTextUser && waitingTextUser.id === socket.id) waitingTextUser = null;
     });
     socket.on('disconnect', () => {
-        if (waitingUser && waitingUser.id === socket.id) waitingUser = null;
+        if (waitingVideoUser && waitingVideoUser.id === socket.id) waitingVideoUser = null;
+        if (waitingTextUser && waitingTextUser.id === socket.id) waitingTextUser = null;
     });
 });
 

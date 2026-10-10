@@ -41,10 +41,18 @@ app.get('/', (req, res) => {
         .logo span { color: #ff6600; }
         .tagline { font-size: 14px; color: #555; font-weight: bold; font-style: italic; }
 
-        /* Barra de opciones e intereses */
-        .options-bar { background: #f4f4f4; border-bottom: 1px solid #ddd; padding: 6px 15px; display: flex; align-items: center; gap: 15px; font-size: 13px; flex-wrap: wrap; }
-        .options-bar label { font-weight: bold; color: #333; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .interest-input { height: 26px; border: 1px solid #aaa; border-radius: 2px; padding: 0 6px; font-size: 12px; outline: none; width: min(250px, 100%); }
+        /* Selector clásico de modo estilo Omegle */
+        .options-bar { background: #f4f4f4; border-bottom: 1px solid #ddd; padding: 9px 15px; display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap; }
+        .mode-title, .interest-title { font-weight: bold; color: #333; }
+        .mode-switch { display: inline-flex; align-items: center; gap: 5px; }
+        .mode-option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 14px; border: 1px solid #b9b9b9; border-radius: 3px; background: linear-gradient(to bottom, #fff 0%, #e8e8e8 100%); color: #333; font-weight: bold; cursor: pointer; user-select: none; transition: background .12s, border-color .12s; }
+        .mode-option:hover { background: #e5efff; border-color: #80aee8; }
+        .mode-option input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+        .mode-option:has(input:checked) { background: #d9eaff; border-color: #428bca; color: #075ca8; box-shadow: inset 0 1px 2px rgba(0,0,0,.08); }
+        .mode-option:has(input:focus-visible) { outline: 2px solid #428bca; outline-offset: 2px; }
+        .mode-icon { font-size: 16px; line-height: 1; }
+        .interest-input { height: 30px; border: 1px solid #aaa; border-radius: 3px; padding: 0 8px; font-size: 12px; outline: none; width: min(250px, 100%); }
+        .interest-input:focus { border-color: #66afe9; box-shadow: 0 0 5px rgba(102,175,233,.45); }
 
         /* Panel principal */
         .main-container { display: flex; flex: 1; min-height: 0; padding: 8px; gap: 8px; background: #fff; flex-direction: column; overflow: hidden; }
@@ -90,7 +98,10 @@ app.get('/', (req, res) => {
             header { padding: 7px 10px; }
             .logo { font-size: 30px; }
             .tagline { font-size: 12px; }
-            .options-bar { gap: 9px; padding: 7px 10px; }
+            .options-bar { gap: 8px; padding: 7px 10px; }
+            .mode-switch { gap: 4px; }
+            .mode-option { min-height: 32px; padding: 0 10px; }
+            .interest-input { flex: 1; min-width: 140px; }
             .controls-panel { gap: 4px; }
             button.btn-action { min-width: 62px; padding: 0 9px; }
             button.btn-send { padding: 0 10px; }
@@ -109,11 +120,13 @@ app.get('/', (req, res) => {
     </header>
 
     <div class="options-bar">
-        <span><strong>Modo:</strong></span>
-        <label><input type="radio" name="chatMode" value="video" checked> Video</label>
-        <label><input type="radio" name="chatMode" value="text"> Texto</label>
-        <span><strong>Intereses:</strong></span>
-        <input type="text" id="interestsInput" class="interest-input" placeholder="Agrega tus intereses (ej: juegos, música)" maxlength="160">
+        <span class="mode-title">¿Cómo quieres chatear?</span>
+        <div class="mode-switch" role="radiogroup" aria-label="Elige el modo de chat">
+            <label class="mode-option"><input type="radio" name="chatMode" value="text"><span class="mode-icon" aria-hidden="true">💬</span> Texto</label>
+            <label class="mode-option"><input type="radio" name="chatMode" value="video" checked><span class="mode-icon" aria-hidden="true">📹</span> Vídeo</label>
+        </div>
+        <span class="interest-title">Intereses:</span>
+        <input type="text" id="interestsInput" class="interest-input" placeholder="Ej.: juegos, música, fútbol" maxlength="160" aria-label="Tus intereses">
     </div>
 
     <div class="main-container">

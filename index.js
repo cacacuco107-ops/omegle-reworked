@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,8 +14,14 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e6
 });
 
+// Verificación de Google
 app.get('/google554feee44a838a44.html', (req, res) => {
     res.type('text/plain').send('google-site-verification: google554feee44a838a44.html');
+});
+
+// Ruta para el Sitemap
+app.get('/sitemap.xml', (req, res) => {
+    res.sendFile(path.join(__dirname, 'sitemap.xml'));
 });
 
 app.get('/', (req, res) => {
@@ -494,7 +501,7 @@ app.get('/', (req, res) => {
             if (generation !== connectionGeneration || currentRoom !== roomId) return;
             await pc.setLocalDescription(offer);
             if (generation !== connectionGeneration || currentRoom !== roomId) return;
-            socket.emit('signal', { roomId, sdp: pc.localDescription });
+            socket.emit('signal', { roomId: currentRoom, sdp: pc.localDescription });
         }
 
         socket.on('signal', async (data) => {

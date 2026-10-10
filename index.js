@@ -21,38 +21,32 @@ app.get('/sitemap.xml', (req, res) => {
 
 app.get('/', (req, res) => {
   res.type('html').send(`<!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Omegle: Talk to strangers!</title>
+<title>Omegle Reworked — Habla con desconocidos</title>
 <meta name="description" content="Omegle Reworked is an independent random text and video chat project.">
 <meta name="robots" content="index, follow">
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;font-family:Arial,Helvetica,sans-serif;color:#333;background:#fff}
-body{min-height:100vh;display:flex;flex-direction:column}header{padding:8px 14px;border-bottom:1px solid #ccc}
-.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.logo{font-size:38px;font-weight:bold;letter-spacing:-1px;color:#ff6600;text-decoration:none}.tagline{font-size:14px;color:#555;font-weight:bold;font-style:italic}
-.landing{width:min(920px,calc(100% - 24px));margin:18px auto;padding:20px 22px;background:#f7f7f7;border:1px solid #ddd;border-radius:4px;text-align:center}
-.landing p{font-size:16px;line-height:1.55;margin:0 auto 12px;max-width:760px}.warning{max-width:760px;margin:16px auto;padding:10px;border:1px solid #e5c36a;background:#fff8df;color:#5d4b1f;font-size:13px;line-height:1.5}
-.options{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;background:white;padding:10px}.mode{min-width:74px;height:38px;padding:0 18px;border:1px solid #1874c8;border-radius:4px;background:linear-gradient(#4da3f5,#0878d1);color:white;font-size:16px;font-weight:bold;cursor:pointer}
-.footer{margin-top:12px;color:#777;font-size:12px}
-#chat{display:none;flex:1;min-height:0;padding:8px;gap:8px;flex-direction:column}body.active{height:100dvh;overflow:hidden}body.active .landing{display:none}body.active #chat{display:flex}
-.videos{display:flex;gap:6px;height:32vh;min-height:130px;max-height:280px}.vbox{flex:1;position:relative;min-width:0;background:#222;border:1px solid #ccc;overflow:hidden}.vbox video{width:100%;height:100%;object-fit:cover}.vlabel{position:absolute;bottom:8px;left:8px;color:white;background:#111;padding:3px 6px;font-weight:bold;font-size:12px}
-body.textmode .videos{display:none}.panel{display:flex;flex:1;min-height:0;flex-direction:column;border:1px solid #aaa;background:#fff}.messages{flex:1;min-height:0;overflow:auto;padding:10px;overflow-wrap:anywhere}.msg{margin:0 0 7px;line-height:1.4}.system{color:#555;font-style:italic}.you{color:#00f;font-weight:bold}.stranger{color:#d00;font-weight:bold}
-.controls{display:flex;gap:6px;padding:6px;border-top:1px solid #ccc;background:#f8f8f8;align-items:center}.action,.send{height:40px;min-width:72px;padding:0 12px;border:1px solid #aaa;border-radius:4px;font-size:14px;font-weight:bold;cursor:pointer}.action{background:linear-gradient(#fff,#e6e6e6);color:#333}.action.stop{background:linear-gradient(#ff4d4d,#c00);color:white;border-color:#900}.send{background:linear-gradient(#fff,#e6e6e6);color:#333}.controls input{flex:1;min-width:0;height:40px;border:1px solid #ccc;border-radius:4px;padding:0 10px;font-size:14px}.status{padding:5px 12px;background:#e9e9e9;border-top:1px solid #ccc;font-size:12px}
-@media(min-width:700px){#chat{flex-direction:row}.videos{height:auto;max-height:none;min-height:0;flex:1;flex-direction:column}.panel{flex:1}.controls{flex-shrink:0}}
-@media(max-width:500px){.logo{font-size:32px}.landing{padding:15px 12px;margin:10px auto}.landing p{font-size:14px}.warning{font-size:12px}.controls{gap:4px;padding:5px}.action,.send{min-width:58px;padding:0 8px}.videos{height:31vh}}
+:root{--blue:#2b91df;--blue-dark:#1769aa;--orange:#ff6b35;--line:#b9d5e9;--paper:#fff;--page:#eaf5fc;--ink:#263746;--muted:#526675}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--page)}body{min-height:100vh;display:flex;flex-direction:column}
+header{background:#fff;border-bottom:3px solid var(--blue);padding:9px max(16px,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.logo{font-size:42px;line-height:1;font-weight:800;letter-spacing:-2px;color:var(--orange);text-decoration:none}.tagline{font-size:15px;color:#333;font-weight:bold;font-style:italic}.independent{font-size:11px;color:#667;max-width:260px;text-align:right}
+.landing{width:min(1040px,calc(100% - 24px));margin:22px auto 18px;display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:stretch}.intro,.startbox{background:#fff;border:1px solid var(--line);border-radius:3px;padding:22px;box-shadow:0 1px 2px #17476b0d}.intro h1{font-size:25px;margin:0 0 12px;color:#245d86}.intro p{font-size:15px;line-height:1.6;margin:0 0 10px}.startbox{background:#f8fcff;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:12px}.startbox h2{font-size:21px;margin:0;color:#245d86}.startbox p{font-size:13px;margin:0;color:var(--muted)}.warning{margin-top:14px;padding:11px 12px;background:#fff9e8;border:1px solid #e6ca78;color:#66521d;font-size:12px;line-height:1.55;text-align:left}.options{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:4px}.mode{min-width:118px;min-height:46px;padding:8px 18px;border:1px solid var(--blue-dark);border-radius:3px;background:linear-gradient(#56b1f5,#2385d1);color:white;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 1px 0 #fff inset}.mode:hover{filter:brightness(1.04)}.footer{margin-top:4px;color:#6d7d89;font-size:11px;line-height:1.5}
+#chat{display:none;width:min(1180px,calc(100% - 16px));margin:10px auto;flex:1;min-height:0;gap:10px;flex-direction:column}body.active{min-height:100vh;height:100dvh;overflow:hidden}body.active .landing{display:none}body.active #chat{display:flex}.videos{display:flex;gap:8px;height:34vh;min-height:140px;max-height:310px}.vbox{flex:1;position:relative;min-width:0;background:#17232d;border:2px solid #b6d7ec;overflow:hidden}.vbox video{width:100%;height:100%;object-fit:cover}.vlabel{position:absolute;bottom:8px;left:8px;color:white;background:#174f7a;padding:4px 8px;font-weight:bold;font-size:12px;border-radius:2px}.panel{display:flex;flex:1;min-height:0;flex-direction:column;border:1px solid #a8c8df;background:#fff;box-shadow:0 1px 2px #17476b0d}.messages{flex:1;min-height:0;overflow:auto;padding:12px;overflow-wrap:anywhere;background:#fff}.msg{margin:0 0 8px;line-height:1.45;font-size:14px}.system{color:#596a76;font-style:italic}.you{color:#1469ac;font-weight:bold}.stranger{color:#d64b3b;font-weight:bold}.controls{display:flex;gap:6px;padding:8px;border-top:1px solid #c3d9e8;background:#f0f8fe;align-items:center;flex-wrap:wrap}.action,.send{min-height:40px;min-width:70px;padding:0 12px;border:1px solid #aac6da;border-radius:3px;font-size:13px;font-weight:bold;cursor:pointer}.action{background:linear-gradient(#fff,#e7f1f8);color:#25465e}.action.stop{background:linear-gradient(#ff725e,#dc4637);color:#fff;border-color:#c73b2d}.send{background:linear-gradient(#56b1f5,#2385d1);color:#fff;border-color:#1769aa}.controls input{flex:1;min-width:90px;height:40px;border:1px solid #b8cedd;border-radius:3px;padding:0 10px;font-size:14px;background:#fff}.status{padding:7px 12px;background:#dceef9;border-top:1px solid #b8d5e7;font-size:12px;color:#37576d;text-align:center}
+body.textmode .videos{display:none}@media(min-width:760px){#chat{flex-direction:row}.videos{height:auto;max-height:none;min-height:0;flex:1;flex-direction:column}.panel{flex:1}.controls{flex-shrink:0}.messages{min-height:150px}}
+@media(max-width:650px){header{padding:10px 13px}.logo{font-size:36px}.tagline{font-size:13px}.independent{display:none}.landing{grid-template-columns:1fr;margin:12px auto;gap:10px}.intro,.startbox{padding:16px}.intro h1{font-size:22px}.mode{flex:1;min-width:110px}.controls{gap:5px;padding:6px}.action,.send{min-width:58px;padding:0 8px;font-size:12px}.videos{height:30vh}.status{font-size:11px}}
 </style>
 <script src="/socket.io/socket.io.js"></script>
 </head>
 <body class="textmode">
-<header><div class="brand"><a class="logo" href="/">omegle</a><span class="tagline">Talk to strangers!</span></div></header>
+<header><div class="brand"><a class="logo" href="/" aria-label="Omegle Reworked inicio">omegle</a><span class="tagline">Talk to strangers! · ¡Habla con desconocidos!</span></div><div class="independent">Omegle Reworked · Proyecto independiente<br>Independent project · No es el servicio original</div></header>
 <section class="landing">
-<p><strong>Omegle</strong> connects you with random strangers for one-on-one conversations.</p>
-<p>Choose text chat or video chat to meet someone new. No account is needed to start.</p>
-<div class="warning"><strong>Be careful when chatting with strangers.</strong> Do not share your full name, address, phone number, passwords, school, or other personal information. End the conversation if someone makes you uncomfortable.</div>
-<div class="options"><span>Start chatting:</span><button class="mode" data-mode="text">Text</button><button class="mode" data-mode="video">Video</button></div>
-<div class="footer">Omegle Reworked is an independent project and is not the original Omegle service.</div>
+<div class="intro"><h1>Talk to strangers! / ¡Habla con desconocidos!</h1>
+<p><strong>Omegle Reworked</strong> te conecta con personas al azar para conversar uno a uno. / Connect with random people for one-on-one conversations.</p>
+<p>Elige chat de texto o video para empezar. No necesitas crear una cuenta. / Choose text or video chat to get started. No account required.</p>
+<div class="warning"><strong>Cuida tu privacidad / Protect your privacy.</strong><br>No compartas tu nombre completo, dirección, teléfono, contraseñas, escuela ni otros datos personales. Termina la conversación si alguien te incomoda.<br>Do not share your full name, address, phone number, passwords, school, or other personal information. Leave if someone makes you uncomfortable.</div></div>
+<div class="startbox"><h2>¡Empieza a chatear! / Start chatting!</h2><p>Elige un modo / Choose a mode</p><div class="options"><button class="mode" data-mode="text">Texto / Text</button><button class="mode" data-mode="video">Video / Video</button></div><div class="footer">Este es un proyecto independiente y no está afiliado al Omegle original.<br>This independent project is not affiliated with the original Omegle service.</div></div>
 </section>
 <main id="chat">
 <div class="videos" id="videos">
@@ -60,17 +54,17 @@ body.textmode .videos{display:none}.panel{display:flex;flex:1;min-height:0;flex-
 <div class="vbox"><video id="remoteVideo" autoplay playsinline></video><span class="vlabel">Stranger</span></div>
 </div>
 <section class="panel"><div class="messages" id="messages" aria-live="polite"><p class="msg system">You are not connected. Choose Text or Video to start chatting.</p></div>
-<div class="controls"><button id="action" class="action">Stop</button><input id="message" maxlength="2000" placeholder="Type your message here..." disabled><button id="send" class="send" disabled>Send</button></div></section>
+<div class="controls"><button id="action" class="action">Stop</button><input id="message" maxlength="2000" placeholder="Escribe tu mensaje / Type your message..." disabled><button id="send" class="send" disabled>Enviar / Send</button><button id="report" class="action" disabled>Reportar / Report</button><button id="block" class="action" disabled>Bloquear / Block</button></div></section>
 </main>
 <div class="status" id="status">Ready.</div>
 <script>
 'use strict';
 const socket = io();
 const $ = id => document.getElementById(id);
-const chat = $('chat'), messages = $('messages'), action = $('action'), input = $('message'), send = $('send'), status = $('status');
+const chat = $('chat'), messages = $('messages'), action = $('action'), input = $('message'), send = $('send'), status = $('status'), reportBtn = $('report'), blockBtn = $('block');
 const localVideo = $('localVideo'), remoteVideo = $('remoteVideo');
 let mode = null, searching = false, room = null, localStream = null, pc = null;
-let queuedCandidates = [], makingOffer = false, closing = false, matchToken = 0;
+let queuedCandidates = [], makingOffer = false, closing = false, matchToken = 0, reportSent = false;
 const rtcConfig = { iceServers: [
  {urls:'stun:stun.l.google.com:19302'},
  {urls:'stun:stun1.l.google.com:19302'}
@@ -96,6 +90,18 @@ function enterChat(nextMode) {
 }
 document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>enterChat(b.dataset.mode)));
 action.addEventListener('click',()=>{ if(room || searching) disconnect(); else if(mode) startSearch(); else { document.body.classList.remove('active'); } });
+reportBtn.addEventListener('click',()=>{
+ if(!room || reportSent) return;
+ const reason=prompt('¿Por qué quieres reportar esta conversación? (acoso, spam, contenido inapropiado u otro)');
+ if(!reason || !reason.trim()) return;
+ socket.emit('report_user',{roomId:room,reason:reason.trim().slice(0,300)});
+ reportSent=true; reportBtn.disabled=true; say('Reporte enviado. Gracias por ayudar a mantener el chat seguro.');
+});
+blockBtn.addEventListener('click',()=>{
+ if(!room) return;
+ if(!confirm('¿Bloquear a esta persona y terminar la conversación?')) return;
+ const blockedRoom=room; socket.emit('block_user',{roomId:blockedRoom}); disconnect('Has bloqueado a esta persona. No volverás a coincidir con ella durante esta conexión.');
+});
 send.addEventListener('click',sendMessage);
 input.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 
@@ -126,7 +132,7 @@ function disconnect(message='You have disconnected.') {
  const oldRoom=room;
  if(oldRoom) socket.emit('leave_room',{roomId:oldRoom});
  if(searching) socket.emit('cancel_search');
- searching=false; room=null; matchToken++; cleanupPeer();
+ searching=false; room=null; matchToken++; cleanupPeer(); reportSent=false; reportBtn.disabled=true; blockBtn.disabled=true;
  input.disabled=true;send.disabled=true;setAction('New conversation',false);
  status.textContent='Disconnected.'; say(message);
  closing=false;
@@ -138,11 +144,11 @@ function cleanupPeer() {
 }
 socket.on('connect',()=>{status.textContent='Connected to server.';});
 socket.on('connect_error',err=>{console.error('Socket.IO connection error:',err);status.textContent='Error conectando al servidor.';});
-socket.on('disconnect',()=>{searching=false;room=null;matchToken++;cleanupPeer();input.disabled=true;send.disabled=true;setAction('Start',false);status.textContent='Se perdió la conexión con el servidor.';say('Se perdió la conexión con el servidor. Recarga para intentarlo de nuevo.');});
+socket.on('disconnect',()=>{searching=false;room=null;matchToken++;cleanupPeer();reportBtn.disabled=true;blockBtn.disabled=true;input.disabled=true;send.disabled=true;setAction('Start',false);status.textContent='Se perdió la conexión con el servidor.';say('Se perdió la conexión con el servidor. Recarga para intentarlo de nuevo.');});
 socket.on('waiting',()=>{if(searching)status.textContent='Looking for someone you can chat with...';});
 socket.on('matched',async data=>{
  if(!data||!data.roomId) return;
- room=data.roomId; searching=false; const token=++matchToken;
+ room=data.roomId; searching=false; const token=++matchToken; reportSent=false; reportBtn.disabled=false; blockBtn.disabled=false;
  input.disabled=false;send.disabled=false;setAction('Stop',true);
  status.textContent='Connected!';say("You're now chatting with a random stranger. Say hi!");
  if(mode==='video') {
@@ -155,7 +161,7 @@ socket.on('matched',async data=>{
 });
 socket.on('partner_left',()=>{
  if(!room)return;
- room=null;searching=false;matchToken++;cleanupPeer();input.disabled=true;send.disabled=true;setAction('New conversation',false);
+ room=null;searching=false;matchToken++;cleanupPeer();reportSent=false;reportBtn.disabled=true;blockBtn.disabled=true;input.disabled=true;send.disabled=true;setAction('New conversation',false);
  status.textContent='Stranger has disconnected.';say('Stranger has disconnected.');
 });
 socket.on('chat_message',text=>{if(typeof text==='string')say('Stranger: '+text.slice(0,2000),'stranger');});
@@ -209,10 +215,14 @@ window.addEventListener('beforeunload',()=>{stopCamera();cleanupPeer();});
 
 let waitingQueue = [];
 const lastMessageAt = new Map();
+const blockedPairs = new Set();
+const reportCooldown = new Map();
 const MESSAGE_COOLDOWN_MS = 300;
 const MAX_MESSAGE_LENGTH = 2000;
 
 function removeFromQueue(id) { waitingQueue = waitingQueue.filter(s => s.id !== id); }
+function pairKey(a,b) { return [a,b].sort().join('::'); }
+function isBlockedPair(a,b) { return blockedPairs.has(pairKey(a,b)); }
 
 function clearRoom(socket, notifyPartner = true) {
  const roomId = socket.currentRoom;
@@ -239,7 +249,7 @@ io.on('connection', socket => {
   socket.location = typeof data.location === 'string' ? data.location.slice(0,100) : 'Unknown';
   socket.mode = data.mode === 'text' ? 'text' : 'video';
   waitingQueue = waitingQueue.filter(s => io.sockets.sockets.has(s.id) && !s.currentRoom);
-  const idx = waitingQueue.findIndex(s => s.id !== socket.id && s.mode === socket.mode);
+  const idx = waitingQueue.findIndex(s => s.id !== socket.id && s.mode === socket.mode && !isBlockedPair(socket.id,s.id) && !isBlockedPair(s.id,socket.id));
   if (idx >= 0) {
    const partner = waitingQueue.splice(idx,1)[0];
    const roomId = `room_${socket.id}_${partner.id}`;
@@ -270,8 +280,27 @@ io.on('connection', socket => {
   const text=data.text.trim().slice(0,MAX_MESSAGE_LENGTH);
   if(text)socket.to(socket.currentRoom).emit('chat_message',text);
  });
+ socket.on('report_user',(data={})=>{
+  if(!socket.currentRoom||data.roomId!==socket.currentRoom||typeof data.reason!=='string')return;
+  const now=Date.now(),last=reportCooldown.get(socket.id)||0;
+  if(now-last<30000)return;
+  reportCooldown.set(socket.id,now);
+  const memberIds=io.sockets.adapter.rooms.get(socket.currentRoom);
+  const reportedId=memberIds?[...memberIds].find(id=>id!==socket.id):null;
+  if(!reportedId)return;
+  const reason=data.reason.trim().slice(0,300).replace(/[\r\n\t]/g,' ');
+  console.log('[USER_REPORT]',JSON.stringify({at:new Date().toISOString(),reporterSocket:socket.id,reportedSocket:reportedId,reason}));
+  socket.emit('report_received');
+ });
+ socket.on('block_user',(data={})=>{
+  if(!socket.currentRoom||data.roomId!==socket.currentRoom)return;
+  const memberIds=io.sockets.adapter.rooms.get(socket.currentRoom);
+  const otherId=memberIds?[...memberIds].find(id=>id!==socket.id):null;
+  if(otherId)blockedPairs.add(pairKey(socket.id,otherId));
+  clearRoom(socket,true); removeFromQueue(socket.id);
+ });
  socket.on('leave_room',()=>{clearRoom(socket,true);removeFromQueue(socket.id);});
- socket.on('disconnect',()=>{clearRoom(socket,true);removeFromQueue(socket.id);lastMessageAt.delete(socket.id);});
+ socket.on('disconnect',()=>{clearRoom(socket,true);removeFromQueue(socket.id);lastMessageAt.delete(socket.id);reportCooldown.delete(socket.id);});
 });
 
 const PORT = process.env.PORT || 3000;

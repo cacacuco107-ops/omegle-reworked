@@ -14,8 +14,15 @@ const io = new Server(server, {
     maxHttpBufferSize: 1e6
 });
 
+// Google Search Console: replace this route's body with the exact verification
+// token/file contents supplied by Google before using HTML-file verification.
 app.get('/google554feee44a838a44.html', (req, res) => {
-    res.type('text/plain').send('google-site-verification: google554feee44a838a44.html');
+    res.status(404).type('text/plain').send('Configura aquí el archivo de verificación exacto de Google Search Console.');
+});
+
+app.get('/sitemap.xml', (req, res) => {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${baseUrl}/</loc></url></urlset>`);
 });
 
 app.get('/', (req, res) => {
@@ -175,7 +182,15 @@ app.get('/', (req, res) => {
     <div class="status-bar" id="statusBar">Listo.</div>
 
     <script>
-        const socket = io();
+        const socket = io({
+            path: '/socket.io/',
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 20000,
+            transports: ['polling', 'websocket']
+        });
         let localStream = null;
         let peerConnection = null;
         let currentRoom = null;
@@ -423,7 +438,8 @@ app.get('/', (req, res) => {
         }
 
         socket.on('connect', () => {
-            statusBar.innerText = 'Connected to server.';
+            statusBar.innerText = 'Conectado al servidor / Connected to server.';
+            console.info('Socket.IO conectado:', socket.id);
         });
 
         socket.on('disconnect', () => {
@@ -436,7 +452,7 @@ app.get('/', (req, res) => {
 
         socket.on('connect_error', (err) => {
             console.warn('Socket.IO connection error:', err.message);
-            statusBar.innerText = 'No se pudo conectar al servidor.';
+            statusBar.innerText = 'Sin conexión al servidor. Reintentando… / Server connection lost. Retrying…';
         });
 
         socket.on('waiting', () => {
@@ -444,7 +460,9 @@ app.get('/', (req, res) => {
         });
 
         socket.on('matched', async ({ roomId, isInitiator, partnerLocation, mode, matchedInterest }) => {
-            if (!isSearching && !roomId) return;
+            // Ignore stale or malformed match events; a valid match must have a room ID
+            // and this client must still be actively searching.
+            if (!isSearching || typeof roomId !== 'string' || !roomId) return;
             currentRoom = roomId;
             isSearching = false;
             pendingIceCandidates = [];
@@ -629,7 +647,20 @@ function cleanInterests(interests) {
 function leaveCurrentRoom(socket) {
     const roomId = socket.currentRoom;
     if (!roomId) return;
-    socket.to(roomId).emit('partner_left');
+
+    // Notify the partner and clear their room state so they can search again.
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (room) {
+        for (const memberId of room) {
+            if (memberId === socket.id) continue;
+            const partner = io.sockets.sockets.get(memberId);
+            if (partner) {
+                partner.emit('partner_left');
+                partner.currentRoom = null;
+                partner.leave(roomId);
+            }
+        }
+    }
     socket.leave(roomId);
     socket.currentRoom = null;
 }
@@ -638,12 +669,13 @@ io.on('connection', (socket) => {
     socket.on('find_partner', (data = {}) => {
         // A user cannot queue or join a second room while already connected.
         if (socket.currentRoom) return;
+        if (waitingQueue.some((entry) => entry.id === socket.id)) return;
         removeFromQueue(socket.id);
 
         socket.location = typeof data.location === 'string'
             ? data.location.slice(0, MAX_LOCATION_LENGTH)
             : 'Desconocida';
-        socket.mode = data.mode === 'text' ? 'text' : 'video';
+        socket.mode = data.mode === 'video' ? 'video' : 'text';
         socket.interests = cleanInterests(data.interests);
 
         // Discard stale/disconnected queue entries before matching.

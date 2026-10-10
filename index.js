@@ -679,14 +679,14 @@ io.on('connection', (socket) => {
         socket.interests = cleanInterests(data.interests);
 
         // Discard stale/disconnected queue entries before matching.
-        waitingQueue = waitingQueue.filter((entry) => entry.connected && entry.connected());
+        waitingQueue = waitingQueue.filter((entry) => entry.connected);
 
         let partnerIndex = -1;
         let matchedInterest = null;
 
         if (socket.interests.length > 0) {
             partnerIndex = waitingQueue.findIndex((partner) => {
-                if (!partner.connected || !partner.connected() ||
+                if (!partner.connected ||
                     partner.mode !== socket.mode || partner.id === socket.id) return false;
 
                 const common = partner.interests.find((interest) => socket.interests.includes(interest));
@@ -701,7 +701,7 @@ io.on('connection', (socket) => {
         // If there is no shared interest, pair with the oldest compatible user.
         if (partnerIndex === -1) {
             partnerIndex = waitingQueue.findIndex((partner) =>
-                partner.connected && partner.connected() &&
+                partner.connected &&
                 partner.mode === socket.mode && partner.id !== socket.id
             );
         }

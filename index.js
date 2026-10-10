@@ -25,46 +25,50 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omegle Revival — Talk to strangers!</title>
-    <meta name="description" content="Chat aleatorio de texto y vídeo para conocer gente nueva. Usa el servicio con respeto y protege tu privacidad.">
+    <title>Omegle: Talk to strangers!</title>
+    <meta name="description" content="Chat de video y texto aleatorio en vivo. Conoce gente nueva de forma anónima y segura.">
     <meta name="keywords" content="omegle, video chat, chat de texto, hablar con desconocidos, omegle clone">
     <meta name="robots" content="index, follow">
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background: #fff; color: #000; display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+        body { background: #fff; color: #000; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
+        body.chat-active { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
 
         /* Header clásico estilo Omegle */
         header { background: #fff; padding: 10px 15px; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid #ccc; }
         .logo-container { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-        .logo { font-size: 38px; font-weight: bold; color: #0080ff; text-decoration: none; font-family: 'Arial Black', Gadget, sans-serif; letter-spacing: -1.5px; }
-        .logo span { color: #ff6600; }
+        .logo { font-size: 38px; font-weight: bold; color: #ff6600; text-decoration: none; font-family: Arial, sans-serif; letter-spacing: -1px; }
         .tagline { font-size: 14px; color: #555; font-weight: bold; font-style: italic; }
-        .welcome-note { padding: 8px 15px; background: #fff9e9; border-bottom: 1px solid #ead9a6; color: #51472c; font-size: 12px; line-height: 1.45; }
-        .welcome-note strong { color: #333; }
 
-        /* Selector clásico de modo estilo Omegle */
-        .options-bar { background: #f4f4f4; border-bottom: 1px solid #ddd; padding: 9px 15px; display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap; }
-        .options-bar .mode-title { margin-right: 2px; }
-        .mode-title, .interest-title { font-weight: bold; color: #333; }
-        .mode-switch { display: inline-flex; align-items: center; gap: 5px; }
-        .mode-option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 14px; border: 1px solid #b9b9b9; border-radius: 3px; background: linear-gradient(to bottom, #fff 0%, #e8e8e8 100%); color: #333; font-weight: bold; cursor: pointer; user-select: none; transition: background .12s, border-color .12s; }
-        .mode-option:hover { background: #e5efff; border-color: #80aee8; }
-        .mode-option input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
-        .mode-option:has(input:checked) { background: #d9eaff; border-color: #428bca; color: #075ca8; box-shadow: inset 0 1px 2px rgba(0,0,0,.08); }
-        .mode-option:has(input:focus-visible) { outline: 2px solid #428bca; outline-offset: 2px; }
-        .mode-icon { font-size: 16px; line-height: 1; }
-        .interest-input { height: 30px; border: 1px solid #aaa; border-radius: 3px; padding: 0 8px; font-size: 12px; outline: none; width: min(250px, 100%); }
-        .interest-input:focus { border-color: #66afe9; box-shadow: 0 0 5px rgba(102,175,233,.45); }
+        .landing-panel { width: min(920px, calc(100% - 28px)); margin: 20px auto 30px; padding: 20px 24px 18px; background: #f7f7f7; border: 1px solid #ddd; border-radius: 3px; color: #333; }
+        .landing-copy { max-width: 760px; margin: 0 auto; text-align: center; font-size: 14px; line-height: 1.55; }
+        .landing-copy p { margin: 0 0 10px; }
+        .classic-warning { margin: 16px auto 0; max-width: 760px; padding: 8px 10px; border: 1px solid #e5c36a; background: #fff8df; color: #5d4b1f; text-align: center; font-size: 12px; line-height: 1.45; }
+        .classic-warning strong { color: #40320f; }
+        .landing-footer { margin-top: 12px; text-align: center; color: #777; font-size: 11px; }
+        body.chat-active .landing-panel { display: none; }
+        .main-container { display: none; }
+        body.chat-active .main-container { display: flex; }
+        body.chat-active .status-bar { display: block; }
+
+        /* Menú clásico: "Start chatting:" con botones azules */
+        .options-bar { background: #fff; border: 0; padding: 12px 15px 14px; display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 14px; flex-wrap: wrap; }
+        .mode-title { color: #333; font-size: 14px; }
+        .mode-switch { display: inline-flex; align-items: center; gap: 7px; }
+        .classic-mode-btn { min-width: 74px; height: 34px; padding: 0 17px; border: 1px solid #1874c8; border-radius: 4px; background: linear-gradient(to bottom, #4da3f5 0%, #0878d1 100%); color: #fff; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+        .classic-mode-btn:hover { background: linear-gradient(to bottom, #368fe5 0%, #0668b8 100%); }
+        .classic-mode-btn:active { transform: translateY(1px); }
+        .classic-mode-btn:focus-visible { outline: 2px solid #ff9900; outline-offset: 2px; }
+        .mode-radio-hidden { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
         /* Panel principal */
-        .main-container { display: flex; flex: 1; min-height: 0; padding: 8px; gap: 8px; background: #fff; flex-direction: column; overflow: hidden; }
+        .main-container { display: none; flex: 1; min-height: 0; padding: 8px; gap: 8px; background: #fff; flex-direction: column; overflow: hidden; }
         @media (min-width: 650px) { .main-container { flex-direction: row; } }
 
-        /* Panel de video estilo clásico */
-        .video-panel { flex: 1; min-height: 0; display: flex; gap: 8px; }
-        @media (min-width: 650px) { .video-panel { flex: 2; flex-direction: column; } }
-        .video-box { flex: 1; background: #222; border-radius: 3px; border: 1px solid #999; position: relative; overflow: hidden; min-height: 140px; }
+        /* Panel de video clásico: las dos cámaras lado a lado */
+        .video-panel { flex: 1.15; min-width: 0; min-height: 0; display: flex; flex-direction: row; gap: 6px; }
+        .video-box { flex: 1; min-width: 0; min-height: 0; background: #222; border-radius: 2px; border: 1px solid #999; position: relative; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; }
         #localVideo { transform: scaleX(-1); }
         .video-label { position: absolute; bottom: 5px; left: 5px; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; border-radius: 2px; font-size: 11px; font-weight: bold; }
@@ -72,7 +76,7 @@ app.get('/', (req, res) => {
         body.text-mode-active .video-panel { display: none !important; }
 
         /* Panel de chat */
-        .chat-panel { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid #999; border-radius: 3px; }
+        .chat-panel { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid #999; border-radius: 2px; }
         .chat-box { flex: 1; min-height: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 
         /* Estilos de mensajes */
@@ -96,23 +100,22 @@ app.get('/', (req, res) => {
         button.btn-send { background: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%); color: #333; border: 1px solid #adadad; font-size: 13px; font-weight: bold; padding: 0 15px; height: 38px; border-radius: 3px; cursor: pointer; }
         button.btn-send:disabled, button.btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .status-bar { background: #e9e9e9; color: #333; padding: 5px 15px; font-size: 11px; border-top: 1px solid #ccc; font-weight: normal; }
-        .controls-panel button:focus-visible, .btn-send:focus-visible { outline: 2px solid #428bca; outline-offset: 2px; }
+        .status-bar { display: none; background: #e9e9e9; color: #333; padding: 4px 15px; font-size: 11px; border-top: 1px solid #ccc; font-weight: normal; }
         @media (max-width: 649px) {
-            .video-panel { min-height: 170px; flex: 0 0 32%; }
-            .chat-panel { flex: 1; }
-            .video-box { min-height: 0; }
-        }
-        @media (max-width: 480px) {
-            header { padding: 7px 10px; }
-            .logo { font-size: 30px; }
+            header { padding: 8px 11px; }
+            .logo { font-size: 32px; }
             .tagline { font-size: 12px; }
-            .welcome-note { padding: 7px 10px; font-size: 11px; }
-            .options-bar { gap: 8px; padding: 7px 10px; }
-            .mode-switch { gap: 4px; }
-            .mode-option { min-height: 32px; padding: 0 10px; }
-            .interest-input { flex: 1; min-width: 140px; }
-            .controls-panel { gap: 4px; }
+            .landing-panel { width: calc(100% - 18px); margin: 10px auto 18px; padding: 15px 12px; }
+            .landing-copy { font-size: 13px; }
+            .classic-warning { font-size: 11px; }
+            .options-bar { gap: 8px; padding: 12px 6px 6px; }
+            .mode-switch { gap: 5px; }
+            .classic-mode-btn { min-width: 70px; height: 34px; padding: 0 14px; }
+            body.chat-active .main-container { flex-direction: column; padding: 5px; gap: 5px; }
+            .video-panel { flex: none; display: flex; flex-direction: row; height: 31vh; min-height: 150px; max-height: 260px; }
+            body.text-mode-active .video-panel { display: none !important; }
+            .chat-panel { flex: 1; }
+            .controls-panel { gap: 4px; padding: 5px; }
             button.btn-action { min-width: 62px; padding: 0 9px; }
             button.btn-send { padding: 0 10px; }
         }
@@ -124,21 +127,32 @@ app.get('/', (req, res) => {
 <body>
     <header>
         <div class="logo-container">
-            <a href="#" class="logo">omegle<span>.com</span></a>
+            <a href="#" class="logo">omegle</a>
             <span class="tagline">Talk to strangers!</span>
         </div>
     </header>
-    <div class="welcome-note"><strong>Bienvenido a Omegle Revival.</strong> Puedes conversar por texto o por vídeo con personas al azar. No compartas datos personales y desconéctate si alguien te incomoda.</div>
 
-    <div class="options-bar">
-        <span class="mode-title">¿Cómo quieres chatear?</span>
-        <div class="mode-switch" role="radiogroup" aria-label="Elige el modo de chat">
-            <label class="mode-option"><input type="radio" name="chatMode" value="text"><span class="mode-icon" aria-hidden="true">💬</span> Texto</label>
-            <label class="mode-option"><input type="radio" name="chatMode" value="video" checked><span class="mode-icon" aria-hidden="true">📹</span> Vídeo</label>
+    <main class="landing-panel" id="landingPanel">
+        <div class="landing-copy">
+            <p><strong>Omegle</strong> connects you with random strangers for one-on-one conversations.</p>
+            <p>Choose text chat or video chat to meet someone new. No account is needed to start.</p>
         </div>
-        <span class="interest-title">Intereses:</span>
-        <input type="text" id="interestsInput" class="interest-input" placeholder="Ej.: juegos, música, fútbol" maxlength="160" aria-label="Tus intereses" title="Separa los intereses con comas para buscar personas con gustos similares">
+        <div class="classic-warning">
+            <strong>Be careful when chatting with strangers.</strong>
+            Do not share your full name, address, phone number, passwords, school, or other personal information.
+            End the conversation if someone makes you uncomfortable.
+        </div>
+        <div class="options-bar">
+        <span class="mode-title">Start chatting:</span>
+        <div class="mode-switch" role="group" aria-label="Start chatting">
+            <button type="button" class="classic-mode-btn" data-mode="text">Text</button>
+            <button type="button" class="classic-mode-btn" data-mode="video">Video</button>
+        </div>
+        <input type="radio" name="chatMode" value="text" class="mode-radio-hidden" aria-hidden="true" tabindex="-1" checked>
+        <input type="radio" name="chatMode" value="video" class="mode-radio-hidden" aria-hidden="true" tabindex="-1">
     </div>
+        <div class="landing-footer">Omegle Reworked is an independent project and is not the original Omegle service.</div>
+    </main>
 
     <div class="main-container">
         <div class="video-panel" id="videoPanel">
@@ -147,13 +161,13 @@ app.get('/', (req, res) => {
         </div>
         <div class="chat-panel">
             <div class="chat-box" id="chatBox" aria-live="polite">
-                <div class="msg system">Omegle: Habla con extraños.</div>
-                <div class="msg system">Presiona "Start" para encontrar a alguien con quien hablar.</div>
+                <div class="msg system">Omegle: Talk to strangers!</div>
+                <div class="msg system">You are not connected. Choose Text or Video to start chatting.</div>
             </div>
             <div class="controls-panel">
                 <button id="actionBtn" class="btn-action">Start</button>
                 <div class="input-wrapper">
-                    <input type="text" id="msgInput" placeholder="Escribe un mensaje..." maxlength="2000" disabled>
+                    <input type="text" id="msgInput" placeholder="Type your message here..." maxlength="2000" disabled>
                 </div>
                 <button id="sendBtn" class="btn-send" disabled>Send</button>
             </div>
@@ -170,9 +184,9 @@ app.get('/', (req, res) => {
         let nsfwLoadPromise = null;
         let scanTimer = null;
         let scanInProgress = false;
-        let myLocation = "Ubicación desconocida";
+        let myLocation = "Unknown";
         let isSearching = false;
-        let isVideoMode = true;
+        let isVideoMode = false;
         let isDisconnecting = false;
         let pendingIceCandidates = [];
         let connectionGeneration = 0;
@@ -184,7 +198,6 @@ app.get('/', (req, res) => {
         const actionBtn = document.getElementById('actionBtn');
         const sendBtn = document.getElementById('sendBtn');
         const statusBar = document.getElementById('statusBar');
-        const interestsInput = document.getElementById('interestsInput');
 
         // STUN helps discover network routes. For restrictive networks, configure a TURN
         // service you control and add its credentials here (do not publish private credentials).
@@ -197,6 +210,19 @@ app.get('/', (req, res) => {
                 // { urls: 'turn:YOUR_TURN_HOST:3478', username: 'YOUR_USERNAME', credential: 'YOUR_PASSWORD' }
             ]
         };
+
+        document.querySelectorAll('.classic-mode-btn').forEach((button) => {
+            button.addEventListener('click', () => {
+                const mode = button.dataset.mode;
+                const radio = document.querySelector('input[name="chatMode"][value="' + mode + '"]');
+                if (!radio) return;
+                const sameMode = radio.checked;
+                radio.checked = true;
+                if (!sameMode) radio.dispatchEvent(new Event('change', { bubbles: true }));
+                document.body.classList.add('chat-active');
+                actionBtn.click();
+            });
+        });
 
         actionBtn.addEventListener('click', handleActionBtn);
         sendBtn.addEventListener('click', sendMessage);
@@ -223,12 +249,8 @@ app.get('/', (req, res) => {
         }
 
         async function init() {
-            fetchLocation();
-            if (isVideoMode) await initCamera();
-            else {
-                document.body.classList.add('text-mode-active');
-                statusBar.innerText = 'Modo Solo Texto activo.';
-            }
+            document.body.classList.add('text-mode-active');
+            statusBar.innerText = 'Ready.';
         }
 
         async function initCamera() {
@@ -344,11 +366,7 @@ app.get('/', (req, res) => {
             actionBtn.innerText = 'Stop';
             actionBtn.className = 'btn-action btn-stop';
 
-            const rawInterests = interestsInput.value
-                .split(',')
-                .map(i => i.trim().toLowerCase().slice(0, 40))
-                .filter(i => i.length > 0)
-                .slice(0, 10);
+            const rawInterests = [];
 
             socket.emit('find_partner', {
                 location: myLocation,
@@ -406,7 +424,7 @@ app.get('/', (req, res) => {
         }
 
         socket.on('connect', () => {
-            statusBar.innerText = 'Conectado al servidor. Presiona Start para buscar.';
+            statusBar.innerText = 'Connected to server.';
         });
 
         socket.on('disconnect', () => {
@@ -440,10 +458,6 @@ app.get('/', (req, res) => {
             if (matchedInterest) addSystemMsg('¡Ambos se interesan por ' + safeText(matchedInterest) + '!');
             else addSystemMsg('¡Estás hablando con un extraño! ¡Di hola!');
 
-            if (partnerLocation) {
-                addLocationMsg('El extraño está en: ' + safeText(partnerLocation));
-                document.getElementById('strangerLabel').innerText = 'Stranger (' + safeText(partnerLocation) + ')';
-            }
 
             if (mode === 'video' && isVideoMode) {
                 if (!localStream) await initCamera();

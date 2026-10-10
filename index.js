@@ -10,7 +10,6 @@ const io = new Server(server, {
         origin: process.env.ALLOWED_ORIGIN || "*",
         methods: ["GET", "POST"]
     },
-    // Limits unusually large socket messages.
     maxHttpBufferSize: 1e6
 });
 
@@ -31,8 +30,9 @@ app.get('/', (req, res) => {
     <meta name="robots" content="index, follow">
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background: #fff; color: #000; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+        body, .chat-container, .room-container { background-color: #ffffff !important; color: #000000; font-family: Arial, Helvetica, sans-serif; }
+        body { display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
         body.chat-active { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
 
         /* Header clásico estilo Omegle */
@@ -52,7 +52,7 @@ app.get('/', (req, res) => {
         body.chat-active .main-container { display: flex; }
         body.chat-active .status-bar { display: block; }
 
-        /* Menú clásico: "Start chatting:" con botones azules */
+        /* Menú clásico */
         .options-bar { background: #fff; border: 0; padding: 12px 15px 14px; display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 14px; flex-wrap: wrap; }
         .mode-title { color: #333; font-size: 14px; }
         .mode-switch { display: inline-flex; align-items: center; gap: 7px; }
@@ -66,32 +66,35 @@ app.get('/', (req, res) => {
         .main-container { display: none; flex: 1; min-height: 0; padding: 8px; gap: 8px; background: #fff; flex-direction: column; overflow: hidden; }
         @media (min-width: 650px) { .main-container { flex-direction: row; } }
 
-        /* Panel de video clásico: las dos cámaras lado a lado */
+        /* Contenedores de video */
         .video-panel { flex: 1.15; min-width: 0; min-height: 0; display: flex; flex-direction: row; gap: 6px; }
-        .video-box { flex: 1; min-width: 0; min-height: 0; background: #222; border-radius: 2px; border: 1px solid #999; position: relative; overflow: hidden; }
+        .video-box, video { background-color: #111111; border: 1px solid #cccccc; border-radius: 0px !important; }
+        .video-box { flex: 1; min-width: 0; min-height: 0; position: relative; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; }
         #localVideo { transform: scaleX(-1); }
-        .video-label { position: absolute; bottom: 5px; left: 5px; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; border-radius: 2px; font-size: 11px; font-weight: bold; }
+        .video-label { background: none !important; color: #cccccc !important; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; position: absolute; bottom: 8px; left: 8px; text-shadow: 1px 1px 1px rgba(0,0,0,0.8); }
 
         body.text-mode-active .video-panel { display: none !important; }
 
         /* Panel de chat */
-        .chat-panel { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid #999; border-radius: 2px; }
+        .chat-panel { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid #999; border-radius: 0px; }
         .chat-box { flex: 1; min-height: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 
-        /* Estilos de mensajes */
+        /* Mensajes del sistema y del usuario */
+        .system-message { color: #555555; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.5; margin-bottom: 8px; }
         .msg { word-break: break-word; overflow-wrap: anywhere; line-height: 1.3; }
         .msg.you { color: #0000ff; font-weight: bold; }
         .msg.stranger { color: #ff0000; font-weight: bold; }
-        .msg.system { color: #555; font-style: italic; font-size: 12px; }
-        .msg.location { color: #008000; font-weight: bold; background: #f0fff0; padding: 3px 6px; border-radius: 2px; border-left: 3px solid #008000; }
+        .msg.system { color: #555555; font-size: 13px; line-height: 1.5; margin-bottom: 4px; }
+        .msg.disconnected { color: #ff0000; font-weight: bold; }
 
-        /* Panel inferior de controles */
+        /* Controles */
         .controls-panel { min-height: 50px; background: #f8f8f8; border-top: 1px solid #ccc; display: flex; padding: 6px; gap: 6px; align-items: center; }
         button.btn-action { background: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%); color: #333; border: 1px solid #adadad; font-size: 14px; font-weight: bold; padding: 0 16px; height: 38px; border-radius: 3px; cursor: pointer; min-width: 80px; }
         button.btn-action:hover { background: #ebebeb; border-color: #adadad; }
         button.btn-stop { background: linear-gradient(to bottom, #ff4d4d 0%, #cc0000 100%); color: #fff; border-color: #b30000; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
         button.btn-stop:hover { background: #cc0000; }
+        button.btn-new { background: #0066cc !important; color: #ffffff !important; border-color: #004080 !important; }
 
         .input-wrapper { flex: 1; min-width: 0; display: flex; position: relative; }
         input[type="text"]#msgInput { width: 100%; min-width: 0; flex: 1; height: 38px; border: 1px solid #ccc; border-radius: 3px; padding: 0 10px; font-size: 13px; outline: none; }
@@ -143,14 +146,14 @@ app.get('/', (req, res) => {
             End the conversation if someone makes you uncomfortable.
         </div>
         <div class="options-bar">
-        <span class="mode-title">Start chatting:</span>
-        <div class="mode-switch" role="group" aria-label="Start chatting">
-            <button type="button" class="classic-mode-btn" data-mode="text">Text</button>
-            <button type="button" class="classic-mode-btn" data-mode="video">Video</button>
+            <span class="mode-title">Start chatting:</span>
+            <div class="mode-switch" role="group" aria-label="Start chatting">
+                <button type="button" class="classic-mode-btn" data-mode="text">Text</button>
+                <button type="button" class="classic-mode-btn" data-mode="video">Video</button>
+            </div>
+            <input type="radio" name="chatMode" value="text" class="mode-radio-hidden" aria-hidden="true" tabindex="-1" checked>
+            <input type="radio" name="chatMode" value="video" class="mode-radio-hidden" aria-hidden="true" tabindex="-1">
         </div>
-        <input type="radio" name="chatMode" value="text" class="mode-radio-hidden" aria-hidden="true" tabindex="-1" checked>
-        <input type="radio" name="chatMode" value="video" class="mode-radio-hidden" aria-hidden="true" tabindex="-1">
-    </div>
         <div class="landing-footer">Omegle Reworked is an independent project and is not the original Omegle service.</div>
     </main>
 
@@ -161,7 +164,7 @@ app.get('/', (req, res) => {
         </div>
         <div class="chat-panel">
             <div class="chat-box" id="chatBox" aria-live="polite">
-                <div class="msg system">Omegle: Talk to strangers!</div>
+                <div class="msg system"><strong>Omegle: Talk to strangers!</strong></div>
                 <div class="msg system">You are not connected. Choose Text or Video to start chatting.</div>
             </div>
             <div class="controls-panel">
@@ -199,15 +202,11 @@ app.get('/', (req, res) => {
         const sendBtn = document.getElementById('sendBtn');
         const statusBar = document.getElementById('statusBar');
 
-        // STUN helps discover network routes. For restrictive networks, configure a TURN
-        // service you control and add its credentials here (do not publish private credentials).
         const rtcConfig = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun2.l.google.com:19302' }
-                // TURN example:
-                // { urls: 'turn:YOUR_TURN_HOST:3478', username: 'YOUR_USERNAME', credential: 'YOUR_PASSWORD' }
             ]
         };
 
@@ -240,7 +239,6 @@ app.get('/', (req, res) => {
                 stopCamera();
                 document.body.classList.add('text-mode-active');
                 statusBar.innerText = 'Modo Texto activo. Cámara apagada.';
-                // A video peer connection cannot be reused as a text connection.
                 if (currentRoom || isSearching) disconnect('Has cambiado el modo de chat.');
             } else {
                 document.body.classList.remove('text-mode-active');
@@ -260,7 +258,6 @@ app.get('/', (req, res) => {
                     throw new Error('getUserMedia no está disponible; se requiere HTTPS o localhost.');
                 }
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                // If the user switched modes while permission was pending, stop the new tracks.
                 if (!isVideoMode) {
                     stream.getTracks().forEach(track => track.stop());
                     return;
@@ -289,7 +286,6 @@ app.get('/', (req, res) => {
         }
 
         function startVideoScanner() {
-            // Only one timer can exist, even after repeated mode changes.
             if (scanTimer) return;
             scanTimer = window.setInterval(scanVideo, 3000);
         }
@@ -309,23 +305,6 @@ app.get('/', (req, res) => {
                 localStream = null;
             }
             localVideo.srcObject = null;
-        }
-
-        async function fetchLocation() {
-            try {
-                const controller = new AbortController();
-                const timeoutId = window.setTimeout(() => controller.abort(), 5000);
-                const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
-                window.clearTimeout(timeoutId);
-                if (!res.ok) throw new Error('No se pudo consultar la ubicación.');
-                const data = await res.json();
-                if (data.city && data.country_name) {
-                    myLocation = data.city + ', ' + data.country_name;
-                    document.getElementById('myLabel').innerText = 'You (' + myLocation + ')';
-                }
-            } catch (e) {
-                // Location is optional; chat still works if the lookup fails.
-            }
         }
 
         async function scanVideo() {
@@ -362,16 +341,18 @@ app.get('/', (req, res) => {
             if (isSearching || currentRoom) return;
 
             isSearching = true;
-            statusBar.innerText = 'Buscando un extraño...';
+            chatBox.innerHTML = '';
+            addSystemMsg('Omegle: Talk to strangers!', 'header');
+            addSystemMsg('Looking for someone you can chat with...');
+
+            statusBar.innerText = 'Looking for someone you can chat with...';
             actionBtn.innerText = 'Stop';
             actionBtn.className = 'btn-action btn-stop';
-
-            const rawInterests = [];
 
             socket.emit('find_partner', {
                 location: myLocation,
                 mode: isVideoMode ? 'video' : 'text',
-                interests: rawInterests
+                interests: []
             });
         }
 
@@ -396,11 +377,15 @@ app.get('/', (req, res) => {
 
             closeConnection();
             isSearching = false;
-            actionBtn.innerText = 'Start';
-            actionBtn.className = 'btn-action';
+            actionBtn.innerText = 'New conversation';
+            actionBtn.className = 'btn-action btn-new';
             statusBar.innerText = 'Desconectado.';
-            if (message) addSystemMsg(message);
-            else addSystemMsg('Te has desconectado.');
+
+            if (message) {
+                addSystemMsg(message);
+            } else {
+                addSystemMsg('Stranger has disconnected.', 'disconnected');
+            }
 
             window.setTimeout(() => { isDisconnecting = false; }, 0);
         }
@@ -432,48 +417,40 @@ app.get('/', (req, res) => {
             isSearching = false;
             actionBtn.innerText = 'Start';
             actionBtn.className = 'btn-action';
-            statusBar.innerText = 'Se perdió la conexión con el servidor. Recarga o vuelve a intentarlo.';
-        });
-
-        socket.on('connect_error', (err) => {
-            console.warn('Socket.IO connection error:', err.message);
-            statusBar.innerText = 'No se pudo conectar al servidor.';
+            statusBar.innerText = 'Se perdió la conexión con el servidor.';
         });
 
         socket.on('waiting', () => {
-            if (isSearching) statusBar.innerText = 'Buscando a alguien con quien hablar...';
+            if (isSearching) statusBar.innerText = 'Looking for someone you can chat with...';
         });
 
-        socket.on('matched', async ({ roomId, isInitiator, partnerLocation, mode, matchedInterest }) => {
+        socket.on('matched', async ({ roomId, isInitiator, partnerLocation, mode }) => {
             if (!isSearching && !roomId) return;
             currentRoom = roomId;
             isSearching = false;
             pendingIceCandidates = [];
             statusBar.innerText = '¡Conectado!';
-            actionBtn.innerText = 'Stop';
+            actionBtn.innerText = 'Disconnect';
             actionBtn.className = 'btn-action btn-stop';
             msgInput.disabled = false;
             sendBtn.disabled = false;
 
-            if (matchedInterest) addSystemMsg('¡Ambos se interesan por ' + safeText(matchedInterest) + '!');
-            else addSystemMsg('¡Estás hablando con un extraño! ¡Di hola!');
-
+            addSystemMsg("You're now chatting with a random stranger. Say hi!");
 
             if (mode === 'video' && isVideoMode) {
                 if (!localStream) await initCamera();
                 if (currentRoom === roomId && localStream) setupWebRTC(isInitiator, roomId);
-                else if (!localStream) statusBar.innerText = 'La cámara no está disponible. Desconéctate y cambia al modo Texto.';
             }
         });
 
         socket.on('partner_left', () => {
             if (!currentRoom) return;
-            addSystemMsg('El extraño se ha desconectado.');
+            addSystemMsg('Stranger has disconnected.', 'disconnected');
             closeConnection();
             isSearching = false;
-            actionBtn.innerText = 'Start';
-            actionBtn.className = 'btn-action';
-            statusBar.innerText = 'La otra persona se desconectó.';
+            actionBtn.innerText = 'New conversation';
+            actionBtn.className = 'btn-action btn-new';
+            statusBar.innerText = 'Stranger has disconnected.';
         });
 
         socket.on('chat_message', (text) => {
@@ -507,28 +484,8 @@ app.get('/', (req, res) => {
                 }
             };
 
-            pc.onconnectionstatechange = () => {
-                if (generation !== connectionGeneration) return;
-                if (pc.connectionState === 'connected') statusBar.innerText = '¡Video conectado!';
-                if (pc.connectionState === 'failed') {
-                    statusBar.innerText = 'Falló la conexión de video. Esta red podría necesitar TURN.';
-                    addSystemMsg('No se pudo establecer el video. Puedes seguir usando el chat de texto o intentar otra vez.');
-                }
-            };
-
-            pc.oniceconnectionstatechange = () => {
-                if (generation !== connectionGeneration) return;
-                if (pc.iceConnectionState === 'disconnected') {
-                    statusBar.innerText = 'Reconectando video...';
-                }
-            };
-
-            // Only the designated initiator creates the offer. The answerer waits for it.
             if (isInitiator) {
-                createAndSendOffer(pc, roomId, generation).catch(err => {
-                    console.error('No se pudo crear la oferta WebRTC:', err);
-                    if (generation === connectionGeneration) statusBar.innerText = 'No se pudo iniciar el video.';
-                });
+                createAndSendOffer(pc, roomId, generation).catch(err => console.error('Error al crear oferta:', err));
             }
         }
 
@@ -550,12 +507,10 @@ app.get('/', (req, res) => {
                     await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
                     if (generation !== connectionGeneration || pc !== peerConnection) return;
 
-                    // Apply candidates that arrived before the remote description.
                     const queued = pendingIceCandidates;
                     pendingIceCandidates = [];
                     for (const candidate of queued) {
-                        try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); }
-                        catch (err) { console.warn('Candidato ICE pendiente rechazado:', err); }
+                        try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (err) {}
                     }
 
                     if (data.sdp.type === 'offer') {
@@ -573,13 +528,9 @@ app.get('/', (req, res) => {
                     }
                 }
             } catch (err) {
-                console.warn('Error procesando señal WebRTC:', err);
+                console.warn('Error en WebRTC signal:', err);
             }
         });
-
-        function safeText(value) {
-            return String(value).replace(/[<>]/g, '');
-        }
 
         function addMsg(prefix, text, type) {
             const div = document.createElement('div');
@@ -589,8 +540,21 @@ app.get('/', (req, res) => {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function addSystemMsg(text) { addMsg('', text, 'system'); }
-        function addLocationMsg(text) { addMsg('', text, 'location'); }
+        function addSystemMsg(text, subType) {
+            const div = document.createElement('div');
+            if (subType === 'header') {
+                div.className = 'msg system';
+                div.innerHTML = '<strong>' + text + '</strong>';
+            } else if (subType === 'disconnected') {
+                div.className = 'msg disconnected';
+                div.innerText = text;
+            } else {
+                div.className = 'msg system';
+                div.innerText = text;
+            }
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
         msgInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') sendMessage();
@@ -609,22 +573,12 @@ app.get('/', (req, res) => {
 });
 
 let waitingQueue = [];
-const MAX_INTERESTS = 10;
-const MAX_INTEREST_LENGTH = 40;
 const MAX_LOCATION_LENGTH = 100;
 const MESSAGE_COOLDOWN_MS = 350;
 const lastMessageAt = new Map();
 
 function removeFromQueue(socketId) {
     waitingQueue = waitingQueue.filter((entry) => entry.id !== socketId);
-}
-
-function cleanInterests(interests) {
-    if (!Array.isArray(interests)) return [];
-    return [...new Set(interests
-        .filter((item) => typeof item === 'string')
-        .map((item) => item.trim().toLowerCase().slice(0, MAX_INTEREST_LENGTH))
-        .filter(Boolean))].slice(0, MAX_INTERESTS);
 }
 
 function leaveCurrentRoom(socket) {
@@ -637,7 +591,6 @@ function leaveCurrentRoom(socket) {
 
 io.on('connection', (socket) => {
     socket.on('find_partner', (data = {}) => {
-        // A user cannot queue or join a second room while already connected.
         if (socket.currentRoom) return;
         removeFromQueue(socket.id);
 
@@ -645,35 +598,13 @@ io.on('connection', (socket) => {
             ? data.location.slice(0, MAX_LOCATION_LENGTH)
             : 'Desconocida';
         socket.mode = data.mode === 'text' ? 'text' : 'video';
-        socket.interests = cleanInterests(data.interests);
 
-        // Discard stale/disconnected queue entries before matching.
         waitingQueue = waitingQueue.filter((entry) => entry.connected && entry.connected());
 
-        let partnerIndex = -1;
-        let matchedInterest = null;
-
-        if (socket.interests.length > 0) {
-            partnerIndex = waitingQueue.findIndex((partner) => {
-                if (!partner.connected || !partner.connected() ||
-                    partner.mode !== socket.mode || partner.id === socket.id) return false;
-
-                const common = partner.interests.find((interest) => socket.interests.includes(interest));
-                if (common) {
-                    matchedInterest = common;
-                    return true;
-                }
-                return false;
-            });
-        }
-
-        // If there is no shared interest, pair with the oldest compatible user.
-        if (partnerIndex === -1) {
-            partnerIndex = waitingQueue.findIndex((partner) =>
-                partner.connected && partner.connected() &&
-                partner.mode === socket.mode && partner.id !== socket.id
-            );
-        }
+        const partnerIndex = waitingQueue.findIndex((partner) =>
+            partner.connected && partner.connected() &&
+            partner.mode === socket.mode && partner.id !== socket.id
+        );
 
         if (partnerIndex !== -1) {
             const partner = waitingQueue.splice(partnerIndex, 1)[0];
@@ -684,18 +615,8 @@ io.on('connection', (socket) => {
             socket.currentRoom = roomId;
             partner.currentRoom = roomId;
 
-            socket.emit('matched', {
-                roomId, isInitiator: true,
-                partnerLocation: partner.location,
-                mode: socket.mode,
-                matchedInterest
-            });
-            partner.emit('matched', {
-                roomId, isInitiator: false,
-                partnerLocation: socket.location,
-                mode: socket.mode,
-                matchedInterest
-            });
+            socket.emit('matched', { roomId, isInitiator: true, mode: socket.mode });
+            partner.emit('matched', { roomId, isInitiator: false, mode: socket.mode });
         } else {
             waitingQueue.push(socket);
             socket.emit('waiting');
@@ -707,7 +628,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('signal', (data = {}) => {
-        // Only relay WebRTC signals to the other member of the sender's current room.
         if (!socket.currentRoom || data.roomId !== socket.currentRoom) return;
         if (!data.sdp && !data.candidate) return;
         socket.to(socket.currentRoom).emit('signal', {

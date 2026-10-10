@@ -39,20 +39,20 @@ app.get('/', (req, res) => {
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background: #fff; color: #000; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
+        body { background: #dce8f5; color: #222; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
         body.chat-active { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
 
         /* Header clásico estilo Omegle */
-        header { background: #fff; padding: 10px 15px; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid #ccc; }
+        header { background: #dce8f5; padding: 14px 18px 4px; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 0; }
         .logo-container { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-        .logo { font-size: 38px; font-weight: bold; color: #ff6600; text-decoration: none; font-family: Arial, sans-serif; letter-spacing: -1px; }
-        .tagline { font-size: 14px; color: #555; font-weight: bold; font-style: italic; }
+        .logo { font-size: 42px; font-weight: bold; color: #ff6600; text-decoration: none; font-family: Arial, sans-serif; letter-spacing: -2px; line-height: 1; }
+        .tagline { font-size: 14px; color: #315b87; font-weight: bold; font-style: italic; }
 
-        .landing-panel { width: min(920px, calc(100% - 28px)); margin: 20px auto 30px; padding: 20px 24px 18px; background: #f7f7f7; border: 1px solid #ddd; border-radius: 3px; color: #333; }
+        .landing-panel { width: min(920px, calc(100% - 28px)); margin: 18px auto 30px; padding: 18px 24px 16px; background: transparent; border: 0; border-radius: 0; color: #333; }
         .landing-copy { max-width: 760px; margin: 0 auto; text-align: center; font-size: 14px; line-height: 1.55; }
         .landing-copy p { margin: 0 0 10px; }
-        .classic-warning { margin: 16px auto 0; max-width: 760px; padding: 8px 10px; border: 1px solid #e5c36a; background: #fff8df; color: #5d4b1f; text-align: center; font-size: 12px; line-height: 1.45; }
-        .classic-warning strong { color: #40320f; }
+        .classic-warning { margin: 16px auto 0; max-width: 760px; padding: 8px 10px; border: 1px solid #c5d5e7; background: #edf4fb; color: #4b5663; text-align: center; font-size: 12px; line-height: 1.45; }
+        .classic-warning strong { color: #344d69; }
         .landing-footer { margin-top: 12px; text-align: center; color: #777; font-size: 11px; }
         body.chat-active .landing-panel { display: none; }
         .main-container { display: none; }
@@ -60,17 +60,17 @@ app.get('/', (req, res) => {
         body.chat-active .status-bar { display: block; }
 
         /* Menú clásico: "Start chatting:" con botones azules */
-        .options-bar { background: #fff; border: 0; padding: 12px 15px 14px; display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 14px; flex-wrap: wrap; }
+        .options-bar { background: transparent; border: 0; padding: 12px 15px 14px; display: flex; align-items: center; justify-content: center; gap: 9px; font-size: 14px; flex-wrap: wrap; }
         .mode-title { color: #333; font-size: 14px; }
         .mode-switch { display: inline-flex; align-items: center; gap: 7px; }
-        .classic-mode-btn { min-width: 74px; height: 34px; padding: 0 17px; border: 1px solid #1874c8; border-radius: 4px; background: linear-gradient(to bottom, #4da3f5 0%, #0878d1 100%); color: #fff; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
-        .classic-mode-btn:hover { background: linear-gradient(to bottom, #368fe5 0%, #0668b8 100%); }
+        .classic-mode-btn { min-width: 74px; height: 34px; padding: 0 17px; border: 1px solid #1b6db3; border-radius: 3px; background: #2f8bd3; color: #fff; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: none; }
+        .classic-mode-btn:hover { background: #2479bd; }
         .classic-mode-btn:active { transform: translateY(1px); }
         .classic-mode-btn:focus-visible { outline: 2px solid #ff9900; outline-offset: 2px; }
         .mode-radio-hidden { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
         /* Panel principal */
-        .main-container { display: none; flex: 1; min-height: 0; padding: 8px; gap: 8px; background: #fff; flex-direction: column; overflow: hidden; }
+        .main-container { display: none; flex: 1; min-height: 0; padding: 8px; gap: 8px; background: #dce8f5; flex-direction: column; overflow: hidden; }
         @media (min-width: 650px) { .main-container { flex-direction: row; } }
 
         /* Panel de video clásico: las dos cámaras lado a lado */
@@ -83,7 +83,7 @@ app.get('/', (req, res) => {
         body.text-mode-active .video-panel { display: none !important; }
 
         /* Panel de chat */
-        .chat-panel { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid #999; border-radius: 2px; }
+        .chat-panel { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid #9eafc2; border-radius: 2px; }
         .chat-box { flex: 1; min-height: 0; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 
         /* Estilos de mensajes */
@@ -94,7 +94,7 @@ app.get('/', (req, res) => {
         .msg.location { color: #008000; font-weight: bold; background: #f0fff0; padding: 3px 6px; border-radius: 2px; border-left: 3px solid #008000; }
 
         /* Panel inferior de controles */
-        .controls-panel { min-height: 50px; background: #f8f8f8; border-top: 1px solid #ccc; display: flex; padding: 6px; gap: 6px; align-items: center; }
+        .controls-panel { min-height: 50px; background: #edf2f7; border-top: 1px solid #c4d0dc; display: flex; padding: 6px; gap: 6px; align-items: center; }
         button.btn-action { background: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%); color: #333; border: 1px solid #adadad; font-size: 14px; font-weight: bold; padding: 0 16px; height: 38px; border-radius: 3px; cursor: pointer; min-width: 80px; }
         button.btn-action:hover { background: #ebebeb; border-color: #adadad; }
         button.btn-stop { background: linear-gradient(to bottom, #ff4d4d 0%, #cc0000 100%); color: #fff; border-color: #b30000; text-shadow: 0 -1px 0 rgba(0,0,0,0.25); }
@@ -107,7 +107,7 @@ app.get('/', (req, res) => {
         button.btn-send { background: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%); color: #333; border: 1px solid #adadad; font-size: 13px; font-weight: bold; padding: 0 15px; height: 38px; border-radius: 3px; cursor: pointer; }
         button.btn-send:disabled, button.btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .status-bar { display: none; background: #e9e9e9; color: #333; padding: 4px 15px; font-size: 11px; border-top: 1px solid #ccc; font-weight: normal; }
+        .status-bar { display: none; background: #c9dced; color: #34495e; padding: 4px 15px; font-size: 11px; border-top: 1px solid #b5c9dc; font-weight: normal; }
         @media (max-width: 649px) {
             header { padding: 8px 11px; }
             .logo { font-size: 32px; }

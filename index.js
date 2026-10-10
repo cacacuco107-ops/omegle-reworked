@@ -18,50 +18,49 @@ app.get('/', (req, res) => {
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
         body { background: #fff; color: #333; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Header clásico Omegle */
-        header { background: #fff; border-bottom: 3px solid #365899; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .logo { font-size: 32px; font-weight: bold; color: #365899; text-decoration: none; font-family: 'Arial Black', Gadget, sans-serif; }
+        /* Header con el azul exacto del logo */
+        header { background: #fff; border-bottom: 3px solid #3b82f6; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 32px; font-weight: bold; color: #3b82f6; text-decoration: none; font-family: 'Arial Black', Gadget, sans-serif; }
         .logo span { color: #ff7700; }
         .tagline { font-size: 13px; color: #555; font-weight: bold; }
 
-        /* Selector de Modo (Video / Texto) */
-        .mode-selector { background: #e9ebee; border-bottom: 1px solid #ccc; padding: 8px 15px; display: flex; align-items: center; gap: 15px; font-size: 14px; }
-        .mode-selector label { font-weight: bold; color: #333; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        /* Selector de Modo */
+        .mode-selector { background: #eff6ff; border-bottom: 1px solid #bfdbfe; padding: 8px 15px; display: flex; align-items: center; gap: 15px; font-size: 14px; }
+        .mode-selector label { font-weight: bold; color: #1e40af; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
-        /* Panel de Controles Arriba */
-        .controls-panel { height: 50px; background: #fff; border-bottom: 1px solid #ccc; display: flex; padding: 6px 12px; gap: 8px; align-items: center; }
-        button.btn-action { background: #3b5998; color: #fff; border: 1px solid #1e2e54; font-size: 15px; font-weight: bold; padding: 0 20px; height: 38px; border-radius: 4px; cursor: pointer; }
-        button.btn-action:hover { background: #2d4373; }
-        button.btn-stop { background: #d9534f; border-color: #d43f3a; }
-        button.btn-stop:hover { background: #c9302c; }
+        /* Panel de Controles */
+        .controls-panel { height: 50px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; padding: 6px 12px; gap: 8px; align-items: center; }
+        button.btn-action { background: #3b82f6; color: #fff; border: 1px solid #2563eb; font-size: 15px; font-weight: bold; padding: 0 20px; height: 38px; border-radius: 4px; cursor: pointer; }
+        button.btn-action:hover { background: #2563eb; }
+        button.btn-stop { background: #ef4444; border-color: #dc2626; }
+        button.btn-stop:hover { background: #dc2626; }
         input[type="text"] { flex: 1; height: 38px; border: 1px solid #ccc; border-radius: 4px; padding: 0 12px; font-size: 14px; outline: none; }
-        input[type="text"]:focus { border-color: #365899; }
+        input[type="text"]:focus { border-color: #3b82f6; }
 
-        .main-container { display: flex; flex: 1; padding: 8px; gap: 8px; background: #f0f2f5; flex-direction: column; overflow: hidden; }
+        .main-container { display: flex; flex: 1; padding: 8px; gap: 8px; background: #f8fafc; flex-direction: column; overflow: hidden; }
         @media (min-width: 650px) { .main-container { flex-direction: row; } }
         
         /* Panel de video */
         .video-panel { flex: 1; display: flex; gap: 8px; }
         @media (min-width: 650px) { .video-panel { flex: 2; flex-direction: column; } }
-        .video-box { flex: 1; background: #000; border-radius: 4px; border: 2px solid #365899; position: relative; overflow: hidden; min-height: 140px; }
+        .video-box { flex: 1; background: #000; border-radius: 4px; border: 2px solid #3b82f6; position: relative; overflow: hidden; min-height: 140px; }
         video { width: 100%; height: 100%; object-fit: cover; }
         #localVideo { transform: scaleX(-1); }
         .video-label { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.7); color: #fff; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
         
-        /* Ocultar panel de video en Modo Texto */
+        /* Ocultar panel de video cuando el modo texto está activo */
         body.text-mode-active .video-panel { display: none !important; }
 
         /* Panel de chat */
-        .chat-panel { flex: 1; display: flex; flex-direction: column; background: #fff; border: 1px solid #ccc; border-radius: 4px; }
-        .chat-box { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 14px; max-height: 100%; background: #fff; }
+        .chat-panel { flex: 1; display: flex; flex-direction: column; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px; }
+        .chat-box { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 14px; background: #fff; }
         .msg { word-break: break-word; line-height: 1.4; }
-        .msg.you { color: #0000ff; font-weight: bold; }
-        .msg.stranger { color: #ff0000; font-weight: bold; }
-        .msg.system { color: #555; font-style: italic; font-size: 12px; }
-        .msg.location { color: #2563eb; font-weight: bold; background: #eff6ff; padding: 4px 8px; border-radius: 4px; border-left: 3px solid #365899; }
+        .msg.you { color: #2563eb; font-weight: bold; }
+        .msg.stranger { color: #dc2626; font-weight: bold; }
+        .msg.system { color: #64748b; font-style: italic; font-size: 12px; }
+        .msg.location { color: #1d4ed8; font-weight: bold; background: #eff6ff; padding: 4px 8px; border-radius: 4px; border-left: 3px solid #3b82f6; }
         
-        /* Barra de estado inferior */
-        .status-bar { background: #e9ebee; color: #555; padding: 5px 15px; font-size: 12px; border-top: 1px solid #ccc; font-weight: bold; }
+        .status-bar { background: #f1f5f9; color: #475569; padding: 5px 15px; font-size: 12px; border-top: 1px solid #cbd5e1; font-weight: bold; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/nsfwjs"></script>
@@ -73,7 +72,6 @@ app.get('/', (req, res) => {
         <span class="tagline">Talk to strangers!</span>
     </header>
     
-    <!-- Selector Video / Texto -->
     <div class="mode-selector">
         <span><strong>Modo de chat:</strong></span>
         <label><input type="radio" name="chatMode" value="video" checked onchange="toggleMode()"> 📹 Video + Texto</label>
@@ -87,12 +85,10 @@ app.get('/', (req, res) => {
     </div>
 
     <div class="main-container">
-        <!-- Panel de Video (Tu cámara a la izquierda, Stranger a la derecha) -->
         <div class="video-panel" id="videoPanel">
             <div class="video-box"><video id="localVideo" autoplay playsinline muted></video><div class="video-label" id="myLabel">You</div></div>
             <div class="video-box"><video id="remoteVideo" autoplay playsinline></video><div class="video-label" id="strangerLabel">Stranger</div></div>
         </div>
-        <!-- Panel de Chat -->
         <div class="chat-panel">
             <div class="chat-box" id="chatBox"><div class="msg system">Presiona Start para buscar a un extraño.</div></div>
         </div>
@@ -122,13 +118,14 @@ app.get('/', (req, res) => {
         function toggleMode() {
             const selected = document.querySelector('input[name="chatMode"]:checked').value;
             isVideoMode = (selected === 'video');
+            
             if (isVideoMode) {
                 document.body.classList.remove('text-mode-active');
                 initCamera();
             } else {
                 document.body.classList.add('text-mode-active');
                 stopCamera();
-                statusBar.innerText = "Modo Solo Texto activo. Listo para buscar.";
+                statusBar.innerText = "Modo Solo Texto activo. Cámara y micrófono apagados.";
             }
         }
 
@@ -136,6 +133,9 @@ app.get('/', (req, res) => {
             fetchLocation();
             if (isVideoMode) {
                 await initCamera();
+            } else {
+                document.body.classList.add('text-mode-active');
+                statusBar.innerText = "Modo Solo Texto activo.";
             }
         }
 
@@ -156,7 +156,9 @@ app.get('/', (req, res) => {
 
         function stopCamera() {
             if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
+                localStream.getTracks().forEach(track => {
+                    track.stop(); // Detener completamente el hardware (cámara y mic)
+                });
                 localStream = null;
                 localVideo.srcObject = null;
             }
@@ -313,7 +315,6 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Colas separadas para Video y Solo Texto
 let waitingVideoUser = null;
 let waitingTextUser = null;
 

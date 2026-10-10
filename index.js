@@ -25,8 +25,8 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omegle: Talk to strangers!</title>
-    <meta name="description" content="Chat de video y texto aleatorio en vivo. Conoce gente nueva de forma anónima y segura.">
+    <title>Omegle Revival — Talk to strangers!</title>
+    <meta name="description" content="Chat aleatorio de texto y vídeo para conocer gente nueva. Usa el servicio con respeto y protege tu privacidad.">
     <meta name="keywords" content="omegle, video chat, chat de texto, hablar con desconocidos, omegle clone">
     <meta name="robots" content="index, follow">
 
@@ -37,12 +37,15 @@ app.get('/', (req, res) => {
         /* Header clásico estilo Omegle */
         header { background: #fff; padding: 10px 15px; display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid #ccc; }
         .logo-container { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-        .logo { font-size: 38px; font-weight: bold; color: #0080ff; text-decoration: none; font-family: 'Arial Black', Gadget, sans-serif; letter-spacing: -1px; }
+        .logo { font-size: 38px; font-weight: bold; color: #0080ff; text-decoration: none; font-family: 'Arial Black', Gadget, sans-serif; letter-spacing: -1.5px; }
         .logo span { color: #ff6600; }
         .tagline { font-size: 14px; color: #555; font-weight: bold; font-style: italic; }
+        .welcome-note { padding: 8px 15px; background: #fff9e9; border-bottom: 1px solid #ead9a6; color: #51472c; font-size: 12px; line-height: 1.45; }
+        .welcome-note strong { color: #333; }
 
         /* Selector clásico de modo estilo Omegle */
         .options-bar { background: #f4f4f4; border-bottom: 1px solid #ddd; padding: 9px 15px; display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap; }
+        .options-bar .mode-title { margin-right: 2px; }
         .mode-title, .interest-title { font-weight: bold; color: #333; }
         .mode-switch { display: inline-flex; align-items: center; gap: 5px; }
         .mode-option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 14px; border: 1px solid #b9b9b9; border-radius: 3px; background: linear-gradient(to bottom, #fff 0%, #e8e8e8 100%); color: #333; font-weight: bold; cursor: pointer; user-select: none; transition: background .12s, border-color .12s; }
@@ -93,11 +96,18 @@ app.get('/', (req, res) => {
         button.btn-send { background: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%); color: #333; border: 1px solid #adadad; font-size: 13px; font-weight: bold; padding: 0 15px; height: 38px; border-radius: 3px; cursor: pointer; }
         button.btn-send:disabled, button.btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .status-bar { background: #e9e9e9; color: #333; padding: 4px 15px; font-size: 11px; border-top: 1px solid #ccc; font-weight: normal; }
+        .status-bar { background: #e9e9e9; color: #333; padding: 5px 15px; font-size: 11px; border-top: 1px solid #ccc; font-weight: normal; }
+        .controls-panel button:focus-visible, .btn-send:focus-visible { outline: 2px solid #428bca; outline-offset: 2px; }
+        @media (max-width: 649px) {
+            .video-panel { min-height: 170px; flex: 0 0 32%; }
+            .chat-panel { flex: 1; }
+            .video-box { min-height: 0; }
+        }
         @media (max-width: 480px) {
             header { padding: 7px 10px; }
             .logo { font-size: 30px; }
             .tagline { font-size: 12px; }
+            .welcome-note { padding: 7px 10px; font-size: 11px; }
             .options-bar { gap: 8px; padding: 7px 10px; }
             .mode-switch { gap: 4px; }
             .mode-option { min-height: 32px; padding: 0 10px; }
@@ -118,6 +128,7 @@ app.get('/', (req, res) => {
             <span class="tagline">Talk to strangers!</span>
         </div>
     </header>
+    <div class="welcome-note"><strong>Bienvenido a Omegle Revival.</strong> Puedes conversar por texto o por vídeo con personas al azar. No compartas datos personales y desconéctate si alguien te incomoda.</div>
 
     <div class="options-bar">
         <span class="mode-title">¿Cómo quieres chatear?</span>
@@ -126,7 +137,7 @@ app.get('/', (req, res) => {
             <label class="mode-option"><input type="radio" name="chatMode" value="video" checked><span class="mode-icon" aria-hidden="true">📹</span> Vídeo</label>
         </div>
         <span class="interest-title">Intereses:</span>
-        <input type="text" id="interestsInput" class="interest-input" placeholder="Ej.: juegos, música, fútbol" maxlength="160" aria-label="Tus intereses">
+        <input type="text" id="interestsInput" class="interest-input" placeholder="Ej.: juegos, música, fútbol" maxlength="160" aria-label="Tus intereses" title="Separa los intereses con comas para buscar personas con gustos similares">
     </div>
 
     <div class="main-container">

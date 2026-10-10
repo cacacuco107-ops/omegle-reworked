@@ -6,6 +6,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Ruta de verificación para Google Search Console
+app.get('/google554feee44a838a44.html', (req, res) => {
+    res.send('google-site-verification: google554feee44a838a44.html');
+});
+
 app.get('/', (req, res) => {
     res.send(`
 <!DOCTYPE html>
@@ -13,7 +18,13 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omegle: Talk to strangers!</title>
+    
+    <!-- Meta etiquetas SEO para Google -->
+    <title>Omegle Reworked - Habla con extraños en video y texto</title>
+    <meta name="description" content="Chat de video y texto aleatorio en vivo. Conoce gente nueva de forma anónima y segura.">
+    <meta name="keywords" content="omegle, video chat, chat de texto, hablar con desconocidos, omegle clone">
+    <meta name="robots" content="index, follow">
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
         body { background: #fff; color: #333; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -157,7 +168,7 @@ app.get('/', (req, res) => {
         function stopCamera() {
             if (localStream) {
                 localStream.getTracks().forEach(track => {
-                    track.stop(); // Detener completamente el hardware (cámara y mic)
+                    track.stop();
                 });
                 localStream = null;
                 localVideo.srcObject = null;
